@@ -9,7 +9,8 @@ table, th, td {
 <head>
 
 <body>
-You've succesfully made it another level deeper in the available folder structure. What does this mean?
+You've successfully loaded the testing PHP page.
+Whether there's any useful data here remains to be seen.
 
 <div style = "border:1px solid black">
 	<b>Some hosting tests. Don't mind these.</b>

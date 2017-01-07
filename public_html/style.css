@@ -1,7 +1,82 @@
-iframe{
-	height: 400px;
-	width: 88%;
+body, html{
+	margin: 0;
+	padding: 0;
+	color: #000;
+	background: #ddeeff;
 }
-p{
+
+#nav {
+	padding: 5px 20px;
+	background: #ccddee;
+}
+#nav p{
+	margin: 0;
+	padding: 0;
+	display: inline;
+}
+#nav ul{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+#nav li{
+	display: inline;
+	margin: 0px 5px;
+	padding: 0;
+}
+
+#wrap{
+	width: 760px;
+	margin: 0 auto;
+	background: #cceeff;
+}
+#header{
+	padding: 5px 10px;
+	background: #eeeeff;
+}
+h1 {
+	margin: 0;
+}
+
+#main{
+	float: right;
+	width: 540px;
+	min-height: 500px;
+	padding: 10px;
+	background: #cccccc;
+}
+h2 {
+	margin: 0 0 1em;
+}
+#sidebar{
+	float: left;
+	width: 180px;
+	padding: 5px 10px;
+	background: #cceeff;
+}
+#footer{
+	clear: both;
+	padding: 5px 10px;
+	background: #cc9;
+}
+#footer p{
+	margin: 0;
+}
+
+
+#testbox{
+	width: 500px;
+	background: #bbbbbb;
+	margin: 0 auto;
+	box-shadow: -5px -5px 25px #888888;
+}
+#testbox iframe{
+	margin: 0 auto;
+	min-height: 300px;
+	width: 400px;
+	border-width: 2px;
+	border-style: solid;
+}
+#warning{
 	color: red;
 }

@@ -1,24 +1,24 @@
 module Main exposing (..)
 
-import Html exposing (program)
+import Html
+import Browser
 import Element exposing (Element,el,text)
 import Element.Attributes exposing (..)
+import Style
 
-import Stylesheet exposing (StyleTypes(..),stylesheet)
-
-main = program
+main = Browser.element
     { init = init
     , update = update
     , view = view
     , subscriptions = subscriptions
     }
 
-init = () ! []
+init () = ((),Cmd.none)
 
-update msg model = init
+update msg model = init ()
 
 view model =
-    Element.viewport stylesheet <|
+    Element.viewport styleSheet <|
         Element.column Page [paddingXY 20 0, height fill, width fill] 
             [ Element.el None [alignTop] (text "I'm at the top!")
             , Element.row None [spacing 20] 
@@ -30,5 +30,13 @@ view model =
             , Element.el None [center,height fill] (text "I'm content!")
             , Element.el None [center,alignBottom] (text "I'ma be a footer when I grow up, ma!")
             ]
+
+type Style = Page | None
+
+styleSheet =
+    Style.styleSheet
+        [ Style.style Page 
+            []
+        ]
 
 subscriptions model = Sub.none

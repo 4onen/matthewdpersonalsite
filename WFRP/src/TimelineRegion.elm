@@ -1,9 +1,9 @@
 module TimelineRegion exposing
-    ( PointData
-    , RegionData
-    , TimelineRegion(..)
-    , getHeadline
-    , getYear
+    ( Date
+    , RegionType(..)
+    , TimelineRegion
+    , compare
+    , compareDates
     , listFromSheet
     )
 
@@ -14,31 +14,44 @@ type alias Described a =
     { a | headline : String, text : Maybe String }
 
 
-type alias PointData =
-    Described { year : Int, month : Maybe Int, day : Maybe Int }
+type alias Date =
+    { year : Int, month : Maybe Int, day : Maybe Int }
 
 
-type alias RegionData =
-    Described { year : Int, month : Maybe Int, day : Maybe Int, endyear : Int, endmonth : Maybe Int, endday : Maybe Int }
+type RegionType
+    = Region Date
+    | Era Date
+    | Point
 
 
-type TimelineRegion
-    = Point PointData
-    | Region RegionData
-    | Era RegionData
+regionType : RegionType -> String
+regionType typ =
+    case typ of
+        Region _ ->
+            "Region"
+
+        Era _ ->
+            "Era"
+
+        Point ->
+            "Point"
+
+
+type alias TimelineRegion =
+    Described { start : Date, end : RegionType }
 
 
 listFromSheet : List (Dict String String) -> Result (List String) (List TimelineRegion)
 listFromSheet =
-    List.filterMap fromRow
+    List.filter (\r -> Dict.get "type" r /= Just "title")
         >> List.foldl
             (\i o ->
-                case ( i, o ) of
+                case ( fromRow i, o ) of
                     ( Err err, Err errlist ) ->
-                        Err <| err :: errlist
+                        Err <| ("Row #: " ++ err) :: errlist
 
                     ( Err err, _ ) ->
-                        Err [ err ]
+                        Err [ "Row #: " ++ err ]
 
                     ( Ok _, Err errlist ) ->
                         Err errlist
@@ -55,214 +68,122 @@ sort =
     List.sortWith compare
 
 
-fromRow : Dict String String -> Maybe (Result String TimelineRegion)
+fromRow : Dict String String -> Result String TimelineRegion
 fromRow r =
-    case Dict.get "type" r of
-        Just "title" ->
-            Nothing
-
-        Just "era" ->
-            r |> regionDataFromRow "era" |> Result.map Era |> Just
-
-        _ ->
-            case Dict.member "endyear" r of
-                True ->
-                    r |> regionDataFromRow "region" |> Result.map Region |> Just
-
-                False ->
-                    r |> pointDataFromRow "point" |> Result.map Point |> Just
-
-
-regionDataFromRow : String -> Dict String String -> Result String RegionData
-regionDataFromRow context r =
-    let
-        startPoint =
-            pointDataFromRow context r
-
-        endyear =
-            Dict.get "endyear" r
-                |> Result.fromMaybe
-                    ("Spreadsheet "
-                        ++ context
-                        ++ " was missing end year!"
-                    )
-                |> Result.andThen (String.toInt >> Result.fromMaybe ("Spreadsheet " ++ context ++ " end year was not an integer!"))
-    in
     Result.map2
-        (\{ headline, text, year, month, day } e ->
+        (\headline date ->
             { headline = headline
-            , text = text
-            , year = year
-            , month = month
-            , day = day
-            , endyear = e
-            , endmonth = Dict.get "endmonth" r |> Maybe.andThen String.toInt
-            , endday = Dict.get "endday" r |> Maybe.andThen String.toInt
-            }
-        )
-        startPoint
-        endyear
-
-
-pointDataFromRow : String -> Dict String String -> Result String PointData
-pointDataFromRow context r =
-    let
-        headline =
-            Dict.get "headline" r
-                |> Result.fromMaybe
-                    ("Spreadsheet "
-                        ++ context
-                        ++ " was missing headline!"
-                    )
-
-        year =
-            Dict.get "year" r
-                |> Result.fromMaybe
-                    ("Spreadsheet "
-                        ++ context
-                        ++ " was missing start year!"
-                    )
-                |> Result.andThen (String.toInt >> Result.fromMaybe ("Spreadsheet " ++ context ++ " year was not an integer!"))
-    in
-    Result.map2
-        (\h y ->
-            { headline = h
             , text = Dict.get "text" r
-            , year = y
-            , month = Dict.get "month" r |> Maybe.andThen String.toInt
-            , day = Dict.get "day" r |> Maybe.andThen String.toInt
+            , start = date
+            , end =
+                case getEndDate r of
+                    Ok enddate ->
+                        case Dict.get "type" r of
+                            Just "era" ->
+                                Era enddate
+
+                            _ ->
+                                Region enddate
+
+                    Err _ ->
+                        Point
             }
         )
-        headline
-        year
+        (Dict.get "headline" r |> Result.fromMaybe "Row missing headline!")
+        (getStartDate r)
 
 
-getHeadline : TimelineRegion -> String
-getHeadline r =
-    case r of
-        Point { headline } ->
-            headline
-
-        Region { headline } ->
-            headline
-
-        Era { headline } ->
-            headline
+getStartDate : Dict String String -> Result String Date
+getStartDate =
+    getDateObj "year" "month" "day"
 
 
-getYear : TimelineRegion -> Int
-getYear r =
-    case r of
-        Point { year } ->
-            year
-
-        Region { year } ->
-            year
-
-        Era { year } ->
-            year
+getEndDate : Dict String String -> Result String Date
+getEndDate =
+    getDateObj "endyear" "endmonth" "endday"
 
 
-compare : TimelineRegion -> TimelineRegion -> Basics.Order
-compare a b =
+getDateObj : String -> String -> String -> Dict String String -> Result String Date
+getDateObj yearkey monthkey daykey r =
+    Dict.get yearkey r
+        |> Result.fromMaybe "DateObj missing year"
+        |> Result.andThen (String.toInt >> Result.fromMaybe "DateObj year not an integer!")
+        |> Result.map
+            (\year ->
+                Date year (Dict.get monthkey r |> Maybe.andThen String.toInt) (Dict.get daykey r |> Maybe.andThen String.toInt)
+            )
+
+
+compareMaybes : Maybe comparable -> Maybe comparable -> Basics.Order
+compareMaybes =
+    compareMaybesWith Basics.compare
+
+
+compareMaybesWith : (a -> b -> Basics.Order) -> Maybe a -> Maybe b -> Basics.Order
+compareMaybesWith f a b =
+    case ( a, b ) of
+        ( Just aval, Just bval ) ->
+            f aval bval
+
+        ( Nothing, Just bval ) ->
+            Basics.LT
+
+        ( Just aval, Nothing ) ->
+            Basics.GT
+
+        ( Nothing, Nothing ) ->
+            Basics.EQ
+
+
+compareDates : Date -> Date -> Basics.Order
+compareDates a b =
     let
-        compareMaybes am bm =
-            case am of
-                Just vala ->
-                    case bm of
-                        Just valb ->
-                            Basics.compare vala valb
-
-                        Nothing ->
-                            Basics.GT
-
-                Nothing ->
-                    case bm of
-                        Just _ ->
-                            Basics.LT
-
-                        Nothing ->
-                            Basics.EQ
-
-        compyr =
-            Basics.compare (getYear a) (getYear b)
+        compyear =
+            Basics.compare a.year b.year
     in
-    if compyr /= EQ then
-        compyr
+    if compyear /= EQ then
+        compyear
 
     else
         let
-            getMonth r =
-                case r of
-                    Point { month } ->
-                        month
-
-                    Region { month } ->
-                        month
-
-                    Era { month } ->
-                        month
-
             compmonth =
-                compareMaybes (getMonth a) (getMonth b)
+                compareMaybes a.month b.month
         in
         if compmonth /= EQ then
             compmonth
 
         else
-            let
-                getDay r =
-                    case r of
-                        Point { day } ->
-                            day
+            compareMaybes a.day b.day
 
-                        Region { day } ->
-                            day
 
-                        Era { day } ->
-                            day
+compare : TimelineRegion -> TimelineRegion -> Basics.Order
+compare a b =
+    let
+        compstart =
+            compareDates a.start b.start
+    in
+    if compstart /= EQ then
+        compstart
 
-                compday =
-                    compareMaybes (getDay a) (getDay b)
-            in
-            if compday /= EQ then
-                compday
+    else
+        case ( a.end, b.end ) of
+            ( Point, Point ) ->
+                EQ
 
-            else
-                let
-                    getEndYear start r =
-                        Maybe.withDefault start <|
-                            case r of
-                                Point _ ->
-                                    Nothing
+            ( Point, _ ) ->
+                LT
 
-                                Region { endyear } ->
-                                    Just endyear
+            ( _, Point ) ->
+                GT
 
-                                Era { endyear } ->
-                                    Just endyear
+            ( Region ea, Region eb ) ->
+                compareDates ea eb
 
-                    compendyear =
-                        Basics.compare (getEndYear (getYear a) a) (getEndYear (getYear b) b)
-                in
-                if compendyear /= EQ then
-                    compendyear
+            ( Era ea, Era eb ) ->
+                compareDates ea eb
 
-                else
-                    let
-                        getEndMonth start r =
-                            Maybe.withDefault 0 <|
-                                case r of
-                                    Point _ ->
-                                        Nothing
+            ( Era _, _ ) ->
+                LT
 
-                                    Region { endmonth } ->
-                                        endmonth
-
-                                    Era { endmonth } ->
-                                        endmonth
-
-                        compendmonth =
-                            Basics.compare (getEndMonth (getMonth b) a) (getEndMonth (getMonth b) b)
-                    in
-                    compendmonth -- Too lazy to do compendday.
+            ( _, Era _ ) ->
+                GT

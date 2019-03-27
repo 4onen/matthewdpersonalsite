@@ -6,7 +6,7 @@ import GSheet
 import Html
 import Html.Attributes as A
 import Http
-import TimelineRegion exposing (TimelineRegion(..))
+import TimelineRegion exposing (RegionType(..), TimelineRegion)
 
 
 main =
@@ -94,7 +94,7 @@ view model =
             , body =
                 let
                     yearlist =
-                        parseresult |> List.map TimelineRegion.getYear
+                        parseresult |> List.map (.start >> .year)
 
                     minyear =
                         yearlist |> List.minimum |> Maybe.withDefault 0
@@ -106,29 +106,29 @@ view model =
                     |> List.indexedMap
                         (\i r ->
                             let
-                                year =
-                                    TimelineRegion.getYear r
+                                startyear =
+                                    r.start.year
 
                                 ey =
-                                    case r of
-                                        Era { endyear } ->
-                                            endyear
+                                    case r.end of
+                                        Era { year } ->
+                                            year
 
-                                        Region { endyear } ->
-                                            endyear
+                                        Region { year } ->
+                                            year
 
                                         _ ->
-                                            year + 1
+                                            startyear + 1
 
                                 color =
-                                    case r of
+                                    case r.end of
                                         Era _ ->
                                             "blue"
 
                                         Region _ ->
                                             "red"
 
-                                        Point _ ->
+                                        Point ->
                                             "green"
                             in
                             Html.div
@@ -136,10 +136,10 @@ view model =
                                 , A.style "position" "absolute"
                                 , A.style "height" "1em"
                                 , A.style "top" <| String.fromInt i ++ "em"
-                                , A.style "width" <| String.fromInt (20 * (ey - year)) ++ "px"
-                                , A.style "left" <| String.fromInt (20 * (year - minyear)) ++ "px"
+                                , A.style "width" <| String.fromInt (20 * (ey - startyear)) ++ "px"
+                                , A.style "left" <| String.fromInt (20 * (startyear - minyear)) ++ "px"
                                 ]
-                                [r |> TimelineRegion.getHeadline |> Html.text]
+                                [ r.headline |> Html.text ]
                         )
             }
 

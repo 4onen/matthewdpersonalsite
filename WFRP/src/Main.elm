@@ -6,6 +6,7 @@ import GSheet
 import Html
 import Html.Attributes as A
 import Http
+import TimelineRegion exposing (TimelineRegion(..))
 
 
 main =
@@ -23,7 +24,7 @@ datasheet_key =
 
 type Model
     = Loading
-    | Loaded GSheet.Table
+    | Loaded (List TimelineRegion)
     | Failure String
 
 
@@ -48,7 +49,16 @@ update (Response result) _ =
     nocmd <|
         case result of
             Result.Ok val ->
-                Loaded val
+                case TimelineRegion.listFromSheet val of
+                    Result.Ok ls ->
+                        Loaded ls
+
+                    Result.Err err ->
+                        err
+                            |> List.intersperse ","
+                            |> List.foldl (++) ""
+                            |> (\s -> "[" ++ s ++ "]")
+                            |> Failure
 
             Result.Err err ->
                 Failure <| stringifyHttpError err
@@ -82,10 +92,57 @@ view model =
         Loaded parseresult ->
             { title = "Loaded!"
             , body =
+                let
+                    yearlist =
+                        parseresult |> List.filterMap TimelineRegion.getYear
+
+                    minyear =
+                        yearlist |> List.minimum |> Maybe.withDefault 0
+
+                    maxyear =
+                        yearlist |> List.maximum |> Maybe.withDefault 0
+                in
                 parseresult
-                    |> List.map
-                        (Dict.toList
-                            >> viewTable
+                    |> List.indexedMap
+                        (\i r ->
+                            let
+                                year =
+                                    TimelineRegion.getYear r |> Maybe.withDefault minyear
+
+                                ey =
+                                    case r of
+                                        Era { endyear } ->
+                                            endyear
+
+                                        Region { endyear } ->
+                                            endyear
+
+                                        _ ->
+                                            year + 1
+
+                                color =
+                                    case r of
+                                        Title _ ->
+                                            "yellow"
+
+                                        Era _ ->
+                                            "blue"
+
+                                        Region _ ->
+                                            "red"
+
+                                        Point _ ->
+                                            "green"
+                            in
+                            Html.div
+                                [ A.style "background-color" color
+                                , A.style "position" "absolute"
+                                , A.style "height" "1em"
+                                , A.style "top" <| String.fromInt i ++ "em"
+                                , A.style "width" <| String.fromInt (20 * (ey - year)) ++ "px"
+                                , A.style "left" <| String.fromInt (20 * (year - minyear)) ++ "px"
+                                ]
+                                [r |> TimelineRegion.getHeadline |> Html.text]
                         )
             }
 

@@ -94,7 +94,7 @@ view model =
             , body =
                 let
                     yearlist =
-                        parseresult |> List.filterMap TimelineRegion.getYear
+                        parseresult |> List.map TimelineRegion.getYear
 
                     minyear =
                         yearlist |> List.minimum |> Maybe.withDefault 0
@@ -107,7 +107,7 @@ view model =
                         (\i r ->
                             let
                                 year =
-                                    TimelineRegion.getYear r |> Maybe.withDefault minyear
+                                    TimelineRegion.getYear r
 
                                 ey =
                                     case r of
@@ -122,9 +122,6 @@ view model =
 
                                 color =
                                     case r of
-                                        Title _ ->
-                                            "yellow"
-
                                         Era _ ->
                                             "blue"
 

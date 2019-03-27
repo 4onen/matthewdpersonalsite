@@ -1,10 +1,11 @@
 module Main exposing (main)
 
 import Browser
+import Dict exposing (Dict)
+import GSheet
 import Html
+import Html.Attributes as A
 import Http
-import Json.Decode as JD
-import Parser exposing ((|.), (|=), Parser)
 
 
 main =
@@ -20,89 +21,21 @@ datasheet_key =
     "1lL9-y3zgfcmst_YMpRLVQwzONZD615SD5-FAZtpJqh8"
 
 
-datasheet_url =
-    "https://spreadsheets.google.com/feeds/list/" ++ datasheet_key ++ "/od6/public/basic?alt=json"
-
-
 type Model
     = Loading
-    | Loaded (List (Result (List Parser.DeadEnd) (List ( String, String ))))
+    | Loaded GSheet.Table
     | Failure String
 
 
 type Msg
-    = Response (Result Http.Error (List (Result (List Parser.DeadEnd) (List ( String, String )))))
+    = Response (Result Http.Error GSheet.Table)
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
     ( Loading
-    , Http.get
-        { url = datasheet_url
-        , expect = Http.expectJson Response decoder
-        }
+    , GSheet.getSheet datasheet_key Response
     )
-
-
-decoder : JD.Decoder (List (Result (List Parser.DeadEnd) (List ( String, String ))))
-decoder =
-    JD.at [ "feed", "entry" ] <|
-        JD.list <|
-            JD.map2
-                (\a b -> Result.map ((::) ( "year", a )) b)
-                (JD.at [ "title", "$t" ] JD.string)
-                (JD.map (Parser.run rowParser) <| JD.at [ "content", "$t" ] JD.string)
-
-
-rowParser : Parser.Parser (List ( String, String ))
-rowParser =
-    let
-        itemStart : Parser.Parser String
-        itemStart =
-            Parser.getChompedString (Parser.chompWhile Char.isLower)
-                |. Parser.symbol ":"
-
-        trimPostfix postfix s =
-            if String.endsWith postfix s then
-                String.dropRight (String.length postfix) s
-
-            else
-                s
-
-        itemContent : Parser.Parser String
-        itemContent =
-            Parser.loop ()
-                (\() ->
-                    Parser.oneOf
-                        [ Parser.succeed (Parser.Done ())
-                            |. Parser.end
-                        , Parser.backtrackable <|
-                            Parser.succeed (Parser.Loop ())
-                                |. Parser.chompWhile (\c -> c /= ',' && c /= ':')
-                                |. Parser.oneOf [ Parser.symbol ",", Parser.end ]
-                        , Parser.succeed (Parser.Done ())
-                        ]
-                )
-                |> Parser.getChompedString
-                |> Parser.map (trimPostfix ",")
-
-        item : Parser.Parser ( String, String )
-        item =
-            Parser.succeed Tuple.pair
-                |= itemStart
-                |. Parser.spaces
-                |= itemContent
-                |. Parser.spaces
-    in
-    Parser.loop []
-        (\found ->
-            Parser.oneOf
-                [ Parser.succeed (Parser.Done found)
-                    |. Parser.end
-                , Parser.map (\new -> Parser.Loop (new :: found))
-                    item
-                ]
-        )
 
 
 nocmd : a -> ( a, Cmd msg )
@@ -118,7 +51,26 @@ update (Response result) _ =
                 Loaded val
 
             Result.Err err ->
-                Failure <| Debug.toString err
+                Failure <| stringifyHttpError err
+
+
+stringifyHttpError : Http.Error -> String
+stringifyHttpError err =
+    case err of
+        Http.BadUrl str ->
+            "Bad URL! \"" ++ str ++ "\""
+
+        Http.Timeout ->
+            "Timeout when trying to connect to Google Spreadsheets..."
+
+        Http.NetworkError ->
+            "The network provider changed while I was talking! Refresh?"
+
+        Http.BadStatus i ->
+            "HTTP Protocol error code " ++ String.fromInt i ++ " received."
+
+        Http.BadBody errstr ->
+            "So there were... a few parsing errors in the spreadsheet. See:\n" ++ errstr
 
 
 view : Model -> Browser.Document Msg
@@ -132,22 +84,22 @@ view model =
             , body =
                 parseresult
                     |> List.map
-                        (\row ->
-                            case row of
-                                Ok data ->
-                                    viewTable data
-
-                                Err err ->
-                                    err
-                                        |> Debug.toString
-                                        |> Html.text
-                                        |> List.singleton
-                                        |> Html.div []
+                        (Dict.toList
+                            >> viewTable
                         )
             }
 
         Failure err ->
-            { title = "Oops!", body = [ Html.text err ] }
+            { title = "Oops!"
+            , body =
+                err
+                    |> String.split "\n"
+                    |> List.map
+                        (Html.text
+                            >> List.singleton
+                            >> Html.p []
+                        )
+            }
 
 
 viewTable : List ( String, String ) -> Html.Html msg
@@ -158,7 +110,7 @@ viewTable =
                 |> List.map (Html.text >> List.singleton >> Html.td [])
                 |> Html.tr []
         )
-        >> Html.table []
+        >> Html.table [ A.style "border" "1px solid black" ]
 
 
 subscriptions : Model -> Sub Msg

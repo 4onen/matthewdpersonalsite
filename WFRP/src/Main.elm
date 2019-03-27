@@ -5,6 +5,7 @@ import Dict exposing (Dict)
 import GSheet
 import Html
 import Html.Attributes as A
+import Html.Events as E
 import Http
 import TimelineRegion exposing (RegionType(..), TimelineRegion)
 
@@ -24,12 +25,13 @@ datasheet_key =
 
 type Model
     = Loading
-    | Loaded (List TimelineRegion)
+    | Loaded (List TimelineRegion) Int
     | Failure String
 
 
 type Msg
     = Response (Result Http.Error GSheet.Table)
+    | ClickOn Int
 
 
 init : () -> ( Model, Cmd Msg )
@@ -45,23 +47,33 @@ nocmd a =
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
-update (Response result) _ =
+update msg model =
     nocmd <|
-        case result of
-            Result.Ok val ->
-                case TimelineRegion.listFromSheet val of
-                    Result.Ok ls ->
-                        Loaded ls
+        case msg of
+            Response result ->
+                case result of
+                    Result.Ok val ->
+                        case TimelineRegion.listFromSheet val of
+                            Result.Ok ls ->
+                                Loaded ls 0
+
+                            Result.Err err ->
+                                err
+                                    |> List.intersperse ","
+                                    |> List.foldl (++) ""
+                                    |> (\s -> "[" ++ s ++ "]")
+                                    |> Failure
 
                     Result.Err err ->
-                        err
-                            |> List.intersperse ","
-                            |> List.foldl (++) ""
-                            |> (\s -> "[" ++ s ++ "]")
-                            |> Failure
+                        Failure <| stringifyHttpError err
 
-            Result.Err err ->
-                Failure <| stringifyHttpError err
+            ClickOn i ->
+                case model of
+                    Loaded data _ ->
+                        Loaded data i
+
+                    _ ->
+                        model
 
 
 stringifyHttpError : Http.Error -> String
@@ -89,12 +101,12 @@ view model =
         Loading ->
             { title = "Loading...", body = [ Html.text "Still loading..." ] }
 
-        Loaded parseresult ->
+        Loaded parseResult selected ->
             { title = "Loaded!"
             , body =
                 let
                     yearlist =
-                        parseresult |> List.map (.start >> .year)
+                        parseResult |> List.map (.start >> .year)
 
                     minyear =
                         yearlist |> List.minimum |> Maybe.withDefault 0
@@ -102,7 +114,7 @@ view model =
                     maxyear =
                         yearlist |> List.maximum |> Maybe.withDefault 0
                 in
-                parseresult
+                parseResult
                     |> List.indexedMap
                         (\i r ->
                             let
@@ -138,8 +150,19 @@ view model =
                                 , A.style "top" <| String.fromInt i ++ "em"
                                 , A.style "width" <| String.fromInt (20 * (ey - startyear)) ++ "px"
                                 , A.style "left" <| String.fromInt (20 * (startyear - minyear)) ++ "px"
+                                , E.onClick <| ClickOn i
                                 ]
                                 [ r.headline |> Html.text ]
+                        )
+                    |> (::)
+                        (selected
+                            |> String.fromInt
+                            |> Html.text
+                            |> List.singleton
+                            |> Html.div
+                                [ A.style "position" "absolute"
+                                , A.style "top" <| String.fromInt (List.length parseResult) ++ "em"
+                                ]
                         )
             }
 

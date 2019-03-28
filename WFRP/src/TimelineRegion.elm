@@ -60,13 +60,32 @@ sort =
 
 fromRow : Dict String String -> Result String TimelineRegion
 fromRow r =
+    let
+        getRowStartDate : Dict String String -> Result String Date
+        getRowStartDate =
+            getRowDateObj "year" "month" "day"
+
+        getRowEndDate : Dict String String -> Result String Date
+        getRowEndDate =
+            getRowDateObj "endyear" "endmonth" "endday"
+
+        getRowDateObj : String -> String -> String -> Dict String String -> Result String Date
+        getRowDateObj yearkey monthkey daykey row =
+            Dict.get yearkey row
+                |> Result.fromMaybe "DateObj missing year"
+                |> Result.andThen (String.toInt >> Result.fromMaybe "DateObj year not an integer!")
+                |> Result.map
+                    (\year ->
+                        Date year (Dict.get monthkey r |> Maybe.andThen String.toInt) (Dict.get daykey r |> Maybe.andThen String.toInt)
+                    )
+    in
     Result.map2
         (\headline date ->
             { headline = headline
             , text = Dict.get "text" r
             , start = date
             , end =
-                case getEndDate r of
+                case getRowEndDate r of
                     Ok enddate ->
                         case Dict.get "type" r of
                             Just "era" ->
@@ -80,28 +99,7 @@ fromRow r =
             }
         )
         (Dict.get "headline" r |> Result.fromMaybe "Row missing headline!")
-        (getStartDate r)
-
-
-getStartDate : Dict String String -> Result String Date
-getStartDate =
-    getDateObj "year" "month" "day"
-
-
-getEndDate : Dict String String -> Result String Date
-getEndDate =
-    getDateObj "endyear" "endmonth" "endday"
-
-
-getDateObj : String -> String -> String -> Dict String String -> Result String Date
-getDateObj yearkey monthkey daykey r =
-    Dict.get yearkey r
-        |> Result.fromMaybe "DateObj missing year"
-        |> Result.andThen (String.toInt >> Result.fromMaybe "DateObj year not an integer!")
-        |> Result.map
-            (\year ->
-                Date year (Dict.get monthkey r |> Maybe.andThen String.toInt) (Dict.get daykey r |> Maybe.andThen String.toInt)
-            )
+        (getRowStartDate r)
 
 
 compareMaybes : Maybe comparable -> Maybe comparable -> Basics.Order

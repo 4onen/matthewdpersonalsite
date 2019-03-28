@@ -55,7 +55,7 @@ update msg model =
                     Result.Ok val ->
                         case TimelineRegion.listFromSheet val of
                             Result.Ok ls ->
-                                Loaded ls 0
+                                Loaded ls -1
 
                             Result.Err err ->
                                 err
@@ -104,66 +104,12 @@ view model =
         Loaded parseResult selected ->
             { title = "Loaded!"
             , body =
-                let
-                    yearlist =
-                        parseResult |> List.map (.start >> .year)
-
-                    minyear =
-                        yearlist |> List.minimum |> Maybe.withDefault 0
-
-                    maxyear =
-                        yearlist |> List.maximum |> Maybe.withDefault 0
-                in
-                parseResult
-                    |> List.indexedMap
-                        (\i r ->
-                            let
-                                startyear =
-                                    r.start.year
-
-                                ey =
-                                    case r.end of
-                                        Era { year } ->
-                                            year
-
-                                        Region { year } ->
-                                            year
-
-                                        _ ->
-                                            startyear + 1
-
-                                color =
-                                    case r.end of
-                                        Era _ ->
-                                            "blue"
-
-                                        Region _ ->
-                                            "red"
-
-                                        Point ->
-                                            "green"
-                            in
-                            Html.div
-                                [ A.style "background-color" color
-                                , A.style "position" "absolute"
-                                , A.style "height" "1em"
-                                , A.style "top" <| String.fromInt i ++ "em"
-                                , A.style "width" <| String.fromInt (20 * (ey - startyear)) ++ "px"
-                                , A.style "left" <| String.fromInt (20 * (startyear - minyear)) ++ "px"
-                                , E.onClick <| ClickOn i
-                                ]
-                                [ r.headline |> Html.text ]
-                        )
-                    |> (::)
-                        (selected
-                            |> String.fromInt
-                            |> Html.text
-                            |> List.singleton
-                            |> Html.div
-                                [ A.style "position" "absolute"
-                                , A.style "top" <| String.fromInt (List.length parseResult) ++ "em"
-                                ]
-                        )
+                [ viewTimeline parseResult selected
+                , List.drop selected parseResult
+                    |> List.head
+                    |> Maybe.map viewRegion
+                    |> Maybe.withDefault (Html.div [] [ Html.text "Nothing selected." ])
+                ]
             }
 
         Failure err ->
@@ -179,15 +125,71 @@ view model =
             }
 
 
-viewTable : List ( String, String ) -> Html.Html msg
-viewTable =
-    List.map
-        (\( a, b ) ->
-            [ a, b ]
-                |> List.map (Html.text >> List.singleton >> Html.td [])
-                |> Html.tr []
-        )
-        >> Html.table [ A.style "border" "1px solid black" ]
+viewTimeline : List TimelineRegion -> Int -> Html.Html Msg
+viewTimeline parseResult selected =
+    let
+        yearlist =
+            parseResult |> List.map (.start >> .year)
+
+        minyear =
+            yearlist |> List.minimum |> Maybe.withDefault 0
+
+        maxyear =
+            yearlist |> List.maximum |> Maybe.withDefault 0
+    in
+    parseResult
+        |> List.indexedMap
+            (\i r ->
+                let
+                    ( begin, end ) =
+                        TimelineRegion.regionBeginEndFloats r
+
+                    color =
+                        case r.end of
+                            Era _ ->
+                                "blue"
+
+                            Region _ ->
+                                "red"
+
+                            Point ->
+                                "green"
+                in
+                Html.div
+                    [ A.style "background-color" color
+                    , A.style "position" "relative"
+                    , A.style "padding" "0"
+                    , A.style "margin" "0"
+                    , A.style "height" "1em"
+                    , A.style "width" <| String.fromFloat (25 * (Maybe.withDefault (begin + 1.0) end - begin)) ++ "px"
+                    , A.style "left" <| String.fromFloat (25 * (begin - toFloat minyear)) ++ "px"
+                    , E.onClick <| ClickOn i
+                    ]
+                    []
+            )
+        |> Html.div
+            [ A.style "background-color" "grey"
+            , A.style "padding" "0"
+            , A.style "margin" "0"
+            , A.style "height" <| (List.length parseResult |> String.fromInt) ++ "em"
+            , A.style "width" "100%"
+            ]
+
+
+viewRegion : TimelineRegion -> Html.Html msg
+viewRegion r =
+    Html.div []
+        [ Html.h1 [] [ Html.text r.headline ]
+        , text (r.text |> Maybe.withDefault "No description.")
+        , text ("Year: " ++ String.fromInt r.start.year)
+        , text ("Month: " ++ (r.start.month |> Maybe.map String.fromInt |> Maybe.withDefault "None"))
+        , text ("Day: " ++ (r.start.day |> Maybe.map String.fromInt |> Maybe.withDefault "None"))
+        ]
+
+
+text : String -> Html.Html msg
+text str =
+    Html.p [] [ Html.text str ]
 
 
 subscriptions : Model -> Sub Msg

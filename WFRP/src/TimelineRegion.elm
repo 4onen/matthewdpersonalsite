@@ -5,6 +5,7 @@ module TimelineRegion exposing
     , compare
     , compareDates
     , listFromSheet
+    , regionBeginEndFloats
     )
 
 import Dict exposing (Dict)
@@ -187,3 +188,32 @@ compare a b =
 
             ( _, Era _ ) ->
                 GT
+
+
+regionBeginEndFloats : TimelineRegion -> ( Float, Maybe Float )
+regionBeginEndFloats r =
+    let
+        begin =
+            dateToFloat r.start
+
+        end =
+            case r.end of
+                Region d ->
+                    Just <| dateToFloat d
+
+                Era d ->
+                    Just <| dateToFloat d
+
+                Point ->
+                    Nothing
+    in
+    ( begin, end )
+
+
+dateToFloat : Date -> Float
+dateToFloat d =
+    toFloat d.year
+        + toFloat (d.month |> Maybe.withDefault 0)
+        / 12.0
+        + toFloat (d.day |> Maybe.withDefault 0)
+        / (31.0*12.0)

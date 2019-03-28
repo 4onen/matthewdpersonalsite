@@ -27,19 +27,6 @@ type RegionType
     | Point
 
 
-regionType : RegionType -> String
-regionType typ =
-    case typ of
-        Region _ ->
-            "Region"
-
-        Era _ ->
-            "Era"
-
-        Point ->
-            "Point"
-
-
 type alias TimelineRegion =
     Described { start : Date, end : RegionType }
 
@@ -192,6 +179,19 @@ compare a b =
                 GT
 
 
+getEnd : TimelineRegion -> Maybe Date
+getEnd r =
+    case r.end of
+        Region date ->
+            Just date
+
+        Era date ->
+            Just date
+
+        Point ->
+            Nothing
+
+
 regionFloatExtents : TimelineRegion -> ( Float, Float )
 regionFloatExtents r =
     let
@@ -199,15 +199,7 @@ regionFloatExtents r =
             dateToFloat r.start
 
         end =
-            case r.end of
-                Region d ->
-                    Just <| dateToFloat d
-
-                Era d ->
-                    Just <| dateToFloat d
-
-                Point ->
-                    Nothing
+            getEnd r |> Maybe.map dateToFloat
     in
     ( begin, Maybe.withDefault begin end )
 
@@ -228,16 +220,7 @@ view r =
             dateString r.start
 
         maybeEndString =
-            (case r.end of
-                Era date ->
-                    Just date
-
-                Region date ->
-                    Just date
-
-                Point ->
-                    Nothing
-            )
+            getEnd r
                 |> Maybe.map dateString
 
         timespanString =

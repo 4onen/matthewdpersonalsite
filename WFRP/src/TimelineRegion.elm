@@ -6,9 +6,11 @@ module TimelineRegion exposing
     , compareDates
     , listFromSheet
     , regionFloatExtents
+    , view
     )
 
 import Dict exposing (Dict)
+import Html
 
 
 type alias Described a =
@@ -217,3 +219,125 @@ dateToFloat d =
         / 12.0
         + toFloat (d.day |> Maybe.withDefault 0)
         / (31.0 * 12.0)
+
+
+view : TimelineRegion -> Html.Html msg
+view r =
+    let
+        startDateString =
+            dateString r.start
+
+        maybeEndString =
+            (case r.end of
+                Era date ->
+                    Just date
+
+                Region date ->
+                    Just date
+
+                Point ->
+                    Nothing
+            )
+                |> Maybe.map dateString
+
+        timespanString =
+            case maybeEndString of
+                Just endDateString ->
+                    startDateString ++ " - " ++ endDateString
+
+                Nothing ->
+                    startDateString
+    in
+    Html.div []
+        [ Html.h2 [] [ Html.text r.headline ]
+        , Html.h3 [] [ Html.text timespanString ]
+        , Html.p [] [ Html.text (r.text |> Maybe.withDefault "") ]
+        ]
+
+
+dateString : Date -> String
+dateString date =
+    case ( monthString date, dayString date ) of
+        ( Just monthName, Just dayName ) ->
+            monthName ++ " " ++ dayName ++ ", " ++ String.fromInt date.year
+
+        ( Just monthName, Nothing ) ->
+            monthName ++ " " ++ String.fromInt date.year
+
+        ( Nothing, _ ) ->
+            String.fromInt date.year
+
+
+monthString : Date -> Maybe String
+monthString date =
+    case date.month of
+        Just 1 ->
+            Just "January"
+
+        Just 2 ->
+            Just "February"
+
+        Just 3 ->
+            Just "March"
+
+        Just 4 ->
+            Just "April"
+
+        Just 5 ->
+            Just "May"
+
+        Just 6 ->
+            Just "June"
+
+        Just 7 ->
+            Just "July"
+
+        Just 8 ->
+            Just "August"
+
+        Just 9 ->
+            Just "September"
+
+        Just 10 ->
+            Just "October"
+
+        Just 11 ->
+            Just "November"
+
+        Just 12 ->
+            Just "December"
+
+        _ ->
+            Nothing
+
+
+dayString : Date -> Maybe String
+dayString =
+    .day
+        >> Maybe.map
+            (\day ->
+                case day of
+                    1 ->
+                        "1st"
+
+                    2 ->
+                        "2nd"
+
+                    3 ->
+                        "3rd"
+
+                    21 ->
+                        "21st"
+
+                    22 ->
+                        "22nd"
+
+                    23 ->
+                        "23rd"
+
+                    31 ->
+                        "31st"
+
+                    n ->
+                        String.fromInt n ++ "th"
+            )

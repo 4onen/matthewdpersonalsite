@@ -154,7 +154,7 @@ view timeline =
         , (if timeline.ui.selected >= 0 then
             List.drop timeline.ui.selected timeline.times
                 |> List.head
-                |> Maybe.map viewRegion
+                |> Maybe.map TimelineRegion.view
 
            else
             Nothing
@@ -248,94 +248,3 @@ viewDiagram times { selected, extents } =
             , onClickNothingElse <| ClickOn -1
             , A.style "background-color" "lightgrey"
             ]
-
-
-viewRegion : TimelineRegion -> Html.Html msg
-viewRegion r =
-    let
-        monthName =
-            case r.start.month of
-                Just 1 ->
-                    "January"
-
-                Just 2 ->
-                    "February"
-
-                Just 3 ->
-                    "March"
-
-                Just 4 ->
-                    "April"
-
-                Just 5 ->
-                    "May"
-
-                Just 6 ->
-                    "June"
-
-                Just 7 ->
-                    "July"
-
-                Just 8 ->
-                    "August"
-
-                Just 9 ->
-                    "September"
-
-                Just 10 ->
-                    "October"
-
-                Just 11 ->
-                    "November"
-
-                Just 12 ->
-                    "December"
-
-                _ ->
-                    "INVALID_MONTH"
-
-        dayName =
-            case r.start.day of
-                Just 1 ->
-                    "1st"
-
-                Just 2 ->
-                    "2nd"
-
-                Just 3 ->
-                    "3rd"
-
-                Just 21 ->
-                    "21st"
-
-                Just 22 ->
-                    "22nd"
-
-                Just 23 ->
-                    "23rd"
-
-                Just 31 ->
-                    "31st"
-
-                Just n ->
-                    String.fromInt n ++ "th"
-
-                _ ->
-                    ""
-
-        dateString =
-            case ( r.start.month, r.start.day ) of
-                ( Just _, Just _ ) ->
-                    monthName ++ " " ++ dayName ++ ", " ++ String.fromInt r.start.year
-
-                ( Just _, Nothing ) ->
-                    monthName ++ ", " ++ String.fromInt r.start.year
-
-                ( Nothing, _ ) ->
-                    String.fromInt r.start.year
-    in
-    Html.div []
-        [ Html.h2 [] [ Html.text r.headline ]
-        , Html.h3 [] [ Html.text dateString ]
-        , text (r.text |> Maybe.withDefault "No description.")
-        ]

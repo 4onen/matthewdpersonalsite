@@ -254,6 +254,7 @@ viewTimeline parseResult { selected, extents } =
                                 True
                     )
                 |> List.length
+                |> (+) 1
                 |> (*) 10
     in
     parseResult
@@ -287,7 +288,7 @@ viewTimeline parseResult { selected, extents } =
                             , A.style "background-color" "lightyellow"
                             , A.style "border" "1px solid black"
                             ]
-                            []
+                            [ Html.i [ A.style "position" "absolute", A.style "bottom" "0" ] [ Html.text r.headline ] ]
 
                     _ ->
                         Html.div
@@ -318,12 +319,92 @@ viewTimeline parseResult { selected, extents } =
 
 viewRegion : TimelineRegion -> Html.Html msg
 viewRegion r =
+    let
+        monthName =
+            case r.start.month of
+                Just 1 ->
+                    "January"
+
+                Just 2 ->
+                    "February"
+
+                Just 3 ->
+                    "March"
+
+                Just 4 ->
+                    "April"
+
+                Just 5 ->
+                    "May"
+
+                Just 6 ->
+                    "June"
+
+                Just 7 ->
+                    "July"
+
+                Just 8 ->
+                    "August"
+
+                Just 9 ->
+                    "September"
+
+                Just 10 ->
+                    "October"
+
+                Just 11 ->
+                    "November"
+
+                Just 12 ->
+                    "December"
+
+                _ ->
+                    "INVALID_MONTH"
+
+        dayName =
+            case r.start.day of
+                Just 1 ->
+                    "1st"
+
+                Just 2 ->
+                    "2nd"
+
+                Just 3 ->
+                    "3rd"
+
+                Just 21 ->
+                    "21st"
+
+                Just 22 ->
+                    "22nd"
+
+                Just 23 ->
+                    "23rd"
+
+                Just 31 ->
+                    "31st"
+
+                Just n ->
+                    String.fromInt n ++ "th"
+
+                _ ->
+                    ""
+
+        dateString =
+            case ( r.start.month, r.start.day ) of
+                ( Just _, Just _ ) ->
+                    monthName ++ " " ++ dayName ++ ", " ++ String.fromInt r.start.year
+
+                ( Just _, Nothing ) ->
+                    monthName ++ ", " ++ String.fromInt r.start.year
+
+                ( Nothing, _ ) ->
+                    String.fromInt r.start.year
+    in
     Html.div []
-        [ Html.h1 [] [ Html.text r.headline ]
+        [ Html.h2 [] [ Html.text r.headline ]
+        , Html.h3 [] [ Html.text dateString ]
         , text (r.text |> Maybe.withDefault "No description.")
-        , text ("Year: " ++ String.fromInt r.start.year)
-        , text ("Month: " ++ (r.start.month |> Maybe.map String.fromInt |> Maybe.withDefault "None"))
-        , text ("Day: " ++ (r.start.day |> Maybe.map String.fromInt |> Maybe.withDefault "None"))
         ]
 
 

@@ -8,7 +8,7 @@ import Html.Attributes as A
 import Html.Events as E
 import Http
 import TimelineRegion exposing (RegionType(..), TimelineRegion)
-import ViewUtil exposing (onClickNothingElse, text)
+import ViewUtil exposing (onClickNothingElse, rangeSliderWithStep, text)
 
 
 main =
@@ -200,34 +200,6 @@ view model =
                             >> Html.p []
                         )
             }
-
-
-rangeSliderWithStep : String -> ( Float, Float, Float ) -> Bool -> (String -> msg) -> Float -> Html.Html msg
-rangeSliderWithStep name ( min, max, step ) disable onInput value =
-    Html.div []
-        [ Html.text name
-        , Html.input
-            [ A.type_ "number"
-            , A.min <| String.fromFloat min
-            , A.max <| String.fromFloat max
-            , A.step <| String.fromFloat step
-            , A.value <| String.fromFloat value
-            , A.disabled disable
-            , E.onInput onInput
-            ]
-            []
-        , Html.input
-            [ A.type_ "range"
-            , A.min <| String.fromFloat min
-            , A.max <| String.fromFloat max
-            , A.step <| String.fromFloat step
-            , A.value <| String.fromFloat value
-            , A.value <| String.fromFloat value
-            , A.disabled disable
-            , E.onInput onInput
-            ]
-            []
-        ]
 
 
 viewTimeline : List TimelineRegion -> UIModel -> Html.Html Msg

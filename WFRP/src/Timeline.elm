@@ -135,31 +135,8 @@ view : Timeline -> Html Msg
 view timeline =
     Html.div []
         [ viewDiagram timeline.times timeline.ui
-        , rangeSliderWithStep "Start date"
-            ( 2000, 2064, 0.1 )
-            False
-            (String.toFloat
-                >> Maybe.withDefault (Tuple.first timeline.ui.extents)
-                >> SlideStart
-            )
-            (Tuple.first timeline.ui.extents)
-        , rangeSliderWithStep "End date"
-            ( 2000, 2064, 0.1 )
-            False
-            (String.toFloat
-                >> Maybe.withDefault (Tuple.first timeline.ui.extents)
-                >> SlideEnd
-            )
-            (Tuple.second timeline.ui.extents)
-        , (if timeline.ui.selected >= 0 then
-            List.drop timeline.ui.selected timeline.times
-                |> List.head
-                |> Maybe.map TimelineRegion.view
-
-           else
-            Nothing
-          )
-            |> Maybe.withDefault (Html.div [] [ Html.text "Nothing selected." ])
+        , viewControls timeline
+        , viewSelected timeline
         ]
 
 
@@ -248,3 +225,48 @@ viewDiagram times { selected, extents } =
             , onClickNothingElse <| ClickOn -1
             , A.style "background-color" "lightgrey"
             ]
+
+
+viewControls : Timeline -> Html Msg
+viewControls timeline =
+    Html.div []
+        [ rangeSliderWithStep "Start date"
+            ( 2000, 2064, 0.1 )
+            False
+            (String.toFloat
+                >> Maybe.withDefault (Tuple.first timeline.ui.extents)
+                >> SlideStart
+            )
+            (Tuple.first timeline.ui.extents)
+        , rangeSliderWithStep "End date"
+            ( 2000, 2064, 0.1 )
+            False
+            (String.toFloat
+                >> Maybe.withDefault (Tuple.first timeline.ui.extents)
+                >> SlideEnd
+            )
+            (Tuple.second timeline.ui.extents)
+        ]
+
+
+viewSelected : Timeline -> Html Msg
+viewSelected timeline =
+    (if timeline.ui.selected >= 0 then
+        timeline.times
+            |> List.drop timeline.ui.selected
+            |> List.head
+            |> Maybe.map TimelineRegion.view
+
+     else
+        timeline.titles
+            |> List.drop (-timeline.ui.selected - 1)
+            |> List.head
+            |> Maybe.map
+                (\r ->
+                    Html.div []
+                        [ Html.h2 [] [ Html.text r.headline ]
+                        , Html.p [] [ Html.text (r.text |> Maybe.withDefault "No title card description text!") ]
+                        ]
+                )
+    )
+        |> Maybe.withDefault (Html.div [] [ Html.text "Nothing selected!" ])

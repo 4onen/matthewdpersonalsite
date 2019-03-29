@@ -7003,9 +7003,12 @@ var elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var author$project$TimelineRegion$dateToFloat = function (d) {
-	return (d.bf + (A2(elm$core$Maybe$withDefault, 0, d.N) / 12.0)) + (A2(elm$core$Maybe$withDefault, 0, d.K) / (31.0 * 12.0));
-};
+var author$project$TimelineRegion$dateToFloat = F2(
+	function (roundBegin, d) {
+		var defaultMonth = roundBegin ? 0 : 12;
+		var defaultDay = roundBegin ? 0 : 31;
+		return (d.bf + (A2(elm$core$Maybe$withDefault, defaultMonth, d.N) / 12.0)) + (A2(elm$core$Maybe$withDefault, defaultDay, d.K) / (31.0 * 12.0));
+	});
 var author$project$TimelineRegion$getEnd = function (r) {
 	var _n0 = r.ag;
 	switch (_n0.$) {
@@ -7032,9 +7035,9 @@ var elm$core$Maybe$map = F2(
 var author$project$TimelineRegion$floatExtents = function (r) {
 	var end = A2(
 		elm$core$Maybe$map,
-		author$project$TimelineRegion$dateToFloat,
+		author$project$TimelineRegion$dateToFloat(false),
 		author$project$TimelineRegion$getEnd(r));
-	var begin = author$project$TimelineRegion$dateToFloat(r.a6);
+	var begin = A2(author$project$TimelineRegion$dateToFloat, true, r.a6);
 	return _Utils_Tuple2(
 		begin,
 		A2(elm$core$Maybe$withDefault, begin, end));

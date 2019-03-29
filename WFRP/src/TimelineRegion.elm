@@ -194,20 +194,24 @@ floatExtents : TimelineRegion -> ( Float, Float )
 floatExtents r =
     let
         begin =
-            dateToFloat r.start
+            dateToFloat True r.start
 
         end =
-            getEnd r |> Maybe.map dateToFloat
+            getEnd r |> Maybe.map (dateToFloat False)
     in
     ( begin, Maybe.withDefault begin end )
 
 
-dateToFloat : Date -> Float
-dateToFloat d =
+dateToFloat : Bool -> Date -> Float
+dateToFloat roundBegin d =
+    let
+        defaultDay = if roundBegin then 0 else 31
+        defaultMonth = if roundBegin then 0 else 12
+    in
     toFloat d.year
-        + toFloat (d.month |> Maybe.withDefault 0)
+        + toFloat (d.month |> Maybe.withDefault defaultMonth)
         / 12.0
-        + toFloat (d.day |> Maybe.withDefault 0)
+        + toFloat (d.day |> Maybe.withDefault defaultDay)
         / (31.0 * 12.0)
 
 

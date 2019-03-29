@@ -4,6 +4,8 @@ module TimelineRegion exposing
     , TimelineRegion
     , compare
     , compareDates
+    , dateExtents
+    , dateToFloat
     , floatExtents
     , listFromSheet
     , toTimeString
@@ -190,6 +192,11 @@ getEnd r =
             Nothing
 
 
+dateExtents : TimelineRegion -> ( Date, Date )
+dateExtents r =
+    ( r.start, getEnd r |> Maybe.withDefault r.start )
+
+
 floatExtents : TimelineRegion -> ( Float, Float )
 floatExtents r =
     let
@@ -205,13 +212,24 @@ floatExtents r =
 dateToFloat : Bool -> Date -> Float
 dateToFloat roundBegin d =
     let
-        defaultDay = if roundBegin then 0 else 31
-        defaultMonth = if roundBegin then 0 else 12
+        defaultDay =
+            if roundBegin then
+                1
+
+            else
+                31
+
+        defaultMonth =
+            if roundBegin then
+                1
+
+            else
+                12
     in
     toFloat d.year
-        + toFloat (d.month |> Maybe.withDefault defaultMonth)
+        + toFloat ((d.month |> Maybe.withDefault defaultMonth)-1)
         / 12.0
-        + toFloat (d.day |> Maybe.withDefault defaultDay)
+        + toFloat ((d.day |> Maybe.withDefault defaultDay)-1)
         / (31.0 * 12.0)
 
 

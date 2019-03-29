@@ -10,14 +10,14 @@ import Html.Parser
 import Html.Parser.Util
 import Json.Decode as JD
 import Task
-import TimelineRegion exposing (RegionType(..), TimelineRegion)
+import TimelineRegion exposing (Date, RegionType(..), TimelineRegion)
 import ViewUtil exposing (onClickNothingElse, rangeSliderWithStep, text)
 
 
 type alias UIModel =
     { selected : Int
     , diagramWidth : Float
-    , extents : ( Float, Float )
+    , extents : ( Date, Date )
     }
 
 
@@ -36,14 +36,18 @@ type alias Timeline =
 
 type Msg
     = Select Int
-    | SlideStart Float
-    | SlideEnd Float
+    | SlideStart Date
+    | SlideEnd Date
     | Resize Float
     | CheckResize
 
 
 timelineID =
     "Timeline"
+
+
+timelineItemSizePx =
+    20
 
 
 fromSheet : List (Dict String String) -> Result (List String) ( Timeline, Cmd Msg )
@@ -100,15 +104,22 @@ fromSheet sheet =
 uiInit : List TimelineRegion -> UIModel
 uiInit ls =
     let
-        ( floatStart, floatEnd ) =
-            floatExtents ls
+        ( begin, end ) =
+            case dateExtents ls of
+                Just dates ->
+                    dates
 
-        ( startYear, endYear ) =
-            ( floor floatStart, ceiling floatEnd )
+                Nothing ->
+                    let
+                        defaultDate =
+                            { year = 0, month = Nothing, day = Nothing }
+                    in
+                    Tuple.pair defaultDate defaultDate
     in
     { selected = -1
     , diagramWidth = 1024
-    , extents = ( toFloat startYear, toFloat endYear )
+    , extents =
+        ( begin, { end | year = end.year + 1 } )
     }
 
 
@@ -119,7 +130,38 @@ getDiagramWidth =
         |> Task.attempt (Result.map (.element >> .width) >> Result.withDefault 1024 >> Resize)
 
 
-floatExtents : List TimelineRegion -> ( Float, Float )
+dateExtents : List TimelineRegion -> Maybe ( Date, Date )
+dateExtents =
+    List.foldl
+        (\r maybeExtents ->
+            case maybeExtents of
+                Nothing ->
+                    Just <| TimelineRegion.dateExtents r
+
+                Just ( begin, end ) ->
+                    let
+                        ( nbegin, nend ) =
+                            TimelineRegion.dateExtents r
+                    in
+                    Just
+                        ( case TimelineRegion.compareDates nbegin begin of
+                            LT ->
+                                nbegin
+
+                            _ ->
+                                begin
+                        , case TimelineRegion.compareDates nend end of
+                            GT ->
+                                nend
+
+                            _ ->
+                                end
+                        )
+        )
+        Nothing
+
+
+floatExtents : List TimelineRegion -> Maybe ( Float, Float )
 floatExtents =
     List.foldl
         (\r maybeExtents ->
@@ -135,7 +177,6 @@ floatExtents =
                     Just ( min rbegin least, max rend greatest )
         )
         Nothing
-        >> Maybe.withDefault ( 0, 0 )
 
 
 update : Msg -> Timeline -> ( Timeline, Cmd Msg )
@@ -162,10 +203,41 @@ updateHelper msg timeline ui =
             )
 
         SlideStart newStart ->
-            ( { ui | extents = ( newStart, max (newStart + 0.1) <| Tuple.second ui.extents ) }, Cmd.none )
+            let
+                ( begin, end ) =
+                    ui.extents
+            in
+            ( { ui
+                | extents =
+                    Debug.log "SlideStart"
+                        ( if TimelineRegion.compareDates newStart end == LT then
+                            newStart
+
+                          else
+                            begin
+                        , end
+                        )
+              }
+            , Cmd.none
+            )
 
         SlideEnd newEnd ->
-            ( { ui | extents = ( min (newEnd - 0.1) <| Tuple.first ui.extents, newEnd ) }, Cmd.none )
+            let
+                ( begin, end ) =
+                    ui.extents
+            in
+            ( { ui
+                | extents =
+                    ( begin
+                    , if TimelineRegion.compareDates newEnd begin == GT then
+                        newEnd
+
+                      else
+                        end
+                    )
+              }
+            , Cmd.none
+            )
 
         Resize newWidth ->
             ( { ui | diagramWidth = newWidth }, Cmd.none )
@@ -189,11 +261,14 @@ viewDiagram times { selected, diagramWidth, extents } =
         yearlist =
             times |> List.map (.start >> .year)
 
-        ( minyear, maxyear ) =
+        ( beginExt, endExt ) =
             extents
 
+        ( beginFlt, endFlt ) =
+            ( TimelineRegion.dateToFloat False beginExt, TimelineRegion.dateToFloat True endExt )
+
         widthscalar =
-            diagramWidth / (maxyear - minyear)
+            diagramWidth / (endFlt - beginFlt)
 
         timelineHeight =
             times
@@ -207,8 +282,8 @@ viewDiagram times { selected, diagramWidth, extents } =
                                 True
                     )
                 |> List.length
-                |> (+) 1
-                |> (*) 10
+                |> (*) timelineItemSizePx
+                |> (+) 12
     in
     times
         |> List.indexedMap
@@ -218,7 +293,10 @@ viewDiagram times { selected, diagramWidth, extents } =
                         TimelineRegion.floatExtents r
 
                     width =
-                        10.0 + widthscalar * (end - begin)
+                        timelineItemSizePx + widthscalar * (end - begin)
+
+                    left =
+                        widthscalar * (begin - beginFlt)
                 in
                 case r.end of
                     Era _ ->
@@ -228,7 +306,7 @@ viewDiagram times { selected, diagramWidth, extents } =
                             , A.style "margin" "0"
                             , A.style "height" ((timelineHeight |> String.fromInt) ++ "px")
                             , A.style "width" <| String.fromFloat width ++ "px"
-                            , A.style "left" <| String.fromFloat (widthscalar * (begin - minyear)) ++ "px"
+                            , A.style "left" <| String.fromFloat left ++ "px"
                             , A.style "top" "0"
                             , onClickNothingElse <| Select i
                             , A.style "background-color" <|
@@ -246,17 +324,17 @@ viewDiagram times { selected, diagramWidth, extents } =
                             [ A.style "box-sizing" "border-box"
                             , A.style "position" "relative"
                             , A.style "margin" "0"
-                            , A.style "height" "10px"
+                            , A.style "height" <| String.fromInt timelineItemSizePx ++ "px"
                             , A.style "width" <| String.fromFloat width ++ "px"
-                            , A.style "left" <| String.fromFloat (widthscalar * (begin - minyear)) ++ "px"
+                            , A.style "left" <| String.fromFloat left ++ "px"
                             , onClickNothingElse <| Select i
                             , A.style "background-color" "tan"
                             , A.style "border" <|
                                 if selected == i then
-                                    "1px outset cyan"
+                                    "3px outset cyan"
 
                                 else
-                                    "2px outset white"
+                                    "4px outset white"
                             , A.style "border-radius" "10px"
                             ]
                             []
@@ -278,28 +356,83 @@ viewDiagram times { selected, diagramWidth, extents } =
 viewControls : Timeline -> Html Msg
 viewControls timeline =
     let
+        defaultDate =
+            { year = 0, month = Nothing, day = Nothing }
+
+        ( begin, end ) =
+            dateExtents timeline.times
+                |> Maybe.withDefault ( defaultDate, defaultDate )
+
         ( firstyear, lastyear ) =
-            floatExtents timeline.times
+            ( begin
+                |> TimelineRegion.dateToFloat True
+                |> Basics.floor
+                |> Basics.toFloat
+            , end
+                |> TimelineRegion.dateToFloat False
+                |> Basics.ceiling
+                |> Basics.toFloat
+            )
+
+        ( uibegin, uiend ) =
+            timeline.ui.extents
     in
     Html.div []
-        [ rangeSliderWithStep "Start date"
-            ( firstyear, lastyear, 0.1 )
-            False
-            (String.toFloat
-                >> Maybe.withDefault (Tuple.first timeline.ui.extents)
-                >> SlideStart
-            )
-            (Tuple.first timeline.ui.extents)
-        , rangeSliderWithStep "End date"
-            ( firstyear, lastyear, 0.1 )
-            False
-            (String.toFloat
-                >> Maybe.withDefault (Tuple.first timeline.ui.extents)
-                >> SlideEnd
-            )
-            (Tuple.second timeline.ui.extents)
-        , Html.button [ E.onClick (Select <| timeline.ui.selected - 1) ] [ Html.text "Previous << " ]
-        , Html.button [ E.onClick (Select <| timeline.ui.selected + 1) ] [ Html.text " >> Next" ]
+        [ Html.button [ E.onClick CheckResize ] [ Html.text "Resize Timeline" ]
+
+        -- Start Date selector
+        , Html.div []
+            [ rangeSliderWithStep
+                ( firstyear, lastyear, 1 )
+                False
+                (String.toFloat
+                    >> Maybe.withDefault (toFloat <| .year (Tuple.first timeline.ui.extents))
+                    >> Basics.floor
+                    >> (\y -> SlideStart { uibegin | year = y })
+                )
+                (toFloat uibegin.year)
+
+            -- Start month
+            , rangeSliderWithStep
+                ( 1, 12, 1 )
+                False
+                (String.toFloat
+                    >> Maybe.map Basics.floor
+                    >> Maybe.withDefault 1
+                    >> Basics.clamp 1 12
+                    >> (\y -> SlideStart { uibegin | month = Just y })
+                )
+                (uibegin.month |> Maybe.withDefault 1 |> toFloat)
+            ]
+
+        -- End Date selector
+        , Html.div []
+            [ rangeSliderWithStep
+                ( firstyear, lastyear, 1 )
+                False
+                (String.toFloat
+                    >> Maybe.withDefault (toFloat <| .year (Tuple.first timeline.ui.extents))
+                    >> Basics.ceiling
+                    >> (\y -> SlideEnd { uiend | year = y })
+                )
+                (uiend.year |> toFloat)
+
+            -- End Month
+            , rangeSliderWithStep
+                ( 1, 12, 1 )
+                False
+                (String.toFloat
+                    >> Maybe.map Basics.floor
+                    >> Maybe.withDefault 1
+                    >> Basics.clamp 1 12
+                    >> (\y -> SlideEnd { uiend | month = Just y })
+                )
+                (uiend.month |> Maybe.withDefault 1 |> toFloat)
+            ]
+        , Html.div []
+            [ Html.button [ E.onClick (Select <| timeline.ui.selected - 1) ] [ Html.text "<< Previous" ]
+            , Html.button [ E.onClick (Select <| timeline.ui.selected + 1) ] [ Html.text "Next >>" ]
+            ]
         ]
 
 

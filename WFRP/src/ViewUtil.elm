@@ -21,11 +21,10 @@ text str =
     Html.p [] [ Html.text str ]
 
 
-rangeSliderWithStep : String -> ( Float, Float, Float ) -> Bool -> (String -> msg) -> Float -> Html.Html msg
-rangeSliderWithStep name ( min, max, step ) disable onInput value =
-    Html.div []
-        [ Html.text name
-        , Html.input
+rangeSliderWithStep : ( Float, Float, Float ) -> Bool -> (String -> msg) -> Float -> Html.Html msg
+rangeSliderWithStep ( min, max, step ) disable onInput value =
+    Html.span []
+        [ Html.input
             [ A.type_ "number"
             , A.min <| String.fromFloat min
             , A.max <| String.fromFloat max

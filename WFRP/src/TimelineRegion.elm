@@ -5,7 +5,7 @@ module TimelineRegion exposing
     , compare
     , compareDates
     , listFromSheet
-    , regionFloatExtents
+    , floatExtents
     , view
     )
 
@@ -190,8 +190,8 @@ getEnd r =
             Nothing
 
 
-regionFloatExtents : TimelineRegion -> ( Float, Float )
-regionFloatExtents r =
+floatExtents : TimelineRegion -> ( Float, Float )
+floatExtents r =
     let
         begin =
             dateToFloat r.start

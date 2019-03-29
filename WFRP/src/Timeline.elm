@@ -1,5 +1,6 @@
 module Timeline exposing (Msg, Timeline, fromSheet, update, view)
 
+import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -28,7 +29,7 @@ type alias Timeline =
 
 
 type Msg
-    = ClickOn Int
+    = Select Int
     | SlideStart Float
     | SlideEnd Float
 
@@ -85,32 +86,34 @@ fromSheet sheet =
 uiInit : List TimelineRegion -> UIModel
 uiInit ls =
     let
-        startyear =
-            ls
-                |> List.map (.start >> .year)
-                |> List.minimum
-                |> Maybe.withDefault 0
+        ( floatStart, floatEnd ) =
+            floatExtents ls
 
-        endyear =
-            ls
-                |> List.map
-                    (\r ->
-                        case r.end of
-                            Point ->
-                                r.start.year
-
-                            Region { year } ->
-                                year
-
-                            Era { year } ->
-                                year
-                    )
-                |> List.maximum
-                |> Maybe.withDefault 0
+        ( startYear, endYear ) =
+            ( floor floatStart, ceiling floatEnd )
     in
     { selected = -1
-    , extents = ( toFloat startyear, toFloat endyear )
+    , extents = ( toFloat startYear, toFloat endYear )
     }
+
+
+floatExtents : List TimelineRegion -> ( Float, Float )
+floatExtents =
+    List.foldl
+        (\r maybeExtents ->
+            case maybeExtents of
+                Nothing ->
+                    Just <| TimelineRegion.floatExtents r
+
+                Just ( least, greatest ) ->
+                    let
+                        ( rbegin, rend ) =
+                            TimelineRegion.floatExtents r
+                    in
+                    Just ( min rbegin least, max rend greatest )
+        )
+        Nothing
+        >> Maybe.withDefault ( 0, 0 )
 
 
 update : Msg -> Timeline -> Timeline
@@ -121,8 +124,14 @@ update msg timeline =
 updateHelper : Msg -> Timeline -> UIModel -> UIModel
 updateHelper msg timeline ui =
     case msg of
-        ClickOn i ->
-            { ui | selected = i }
+        Select i ->
+            { ui
+                | selected =
+                    Basics.clamp
+                        (Basics.negate <| List.length timeline.titles)
+                        (List.length timeline.times - 1)
+                        i
+            }
 
         SlideStart newStart ->
             { ui | extents = ( newStart, max (newStart + 0.1) <| Tuple.second ui.extents ) }
@@ -172,17 +181,10 @@ viewDiagram times { selected, extents } =
             (\i r ->
                 let
                     ( begin, end ) =
-                        TimelineRegion.regionFloatExtents r
+                        TimelineRegion.floatExtents r
 
                     width =
                         10.0 + widthscalar * (end - begin)
-
-                    borderColor =
-                        if selected == i then
-                            "cyan"
-
-                        else
-                            "white"
                 in
                 case r.end of
                     Era _ ->
@@ -194,8 +196,13 @@ viewDiagram times { selected, extents } =
                             , A.style "width" <| String.fromFloat width ++ "px"
                             , A.style "left" <| String.fromFloat (widthscalar * (begin - minyear)) ++ "px"
                             , A.style "top" "0"
-                            , onClickNothingElse <| ClickOn i
-                            , A.style "background-color" "lightyellow"
+                            , onClickNothingElse <| Select i
+                            , A.style "background-color" <|
+                                if selected == i then
+                                    "cyan"
+
+                                else
+                                    "lightyellow"
                             , A.style "border" "1px solid black"
                             ]
                             [ Html.i [ A.style "position" "absolute", A.style "bottom" "0" ] [ Html.text r.headline ] ]
@@ -208,9 +215,14 @@ viewDiagram times { selected, extents } =
                             , A.style "height" "10px"
                             , A.style "width" <| String.fromFloat width ++ "px"
                             , A.style "left" <| String.fromFloat (widthscalar * (begin - minyear)) ++ "px"
-                            , onClickNothingElse <| ClickOn i
+                            , onClickNothingElse <| Select i
                             , A.style "background-color" "tan"
-                            , A.style "border" <| "2px outset " ++ borderColor
+                            , A.style "border" <|
+                                if selected == i then
+                                    "1px outset cyan"
+
+                                else
+                                    "2px outset white"
                             , A.style "border-radius" "10px"
                             ]
                             []
@@ -222,7 +234,7 @@ viewDiagram times { selected, extents } =
             , A.style "height" ((timelineHeight |> String.fromInt) ++ "px")
             , A.style "width" "100%"
             , A.style "overflow" "hidden"
-            , onClickNothingElse <| ClickOn -1
+            , onClickNothingElse <| Select -1
             , A.style "background-color" "lightgrey"
             ]
 
@@ -246,6 +258,8 @@ viewControls timeline =
                 >> SlideEnd
             )
             (Tuple.second timeline.ui.extents)
+        , Html.button [ E.onClick (Select <| timeline.ui.selected - 1) ] [ Html.text "Previous << " ]
+        , Html.button [ E.onClick (Select <| timeline.ui.selected + 1) ] [ Html.text " >> Next" ]
         ]
 
 

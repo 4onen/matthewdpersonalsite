@@ -1,16 +1,21 @@
 module Timeline exposing (Msg, Timeline, fromSheet, update, view)
 
+import Browser.Dom
 import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
+import Html.Parser
 import Html.Attributes as A
 import Html.Events as E
+import Json.Decode as JD
+import Task
 import TimelineRegion exposing (RegionType(..), TimelineRegion)
 import ViewUtil exposing (onClickNothingElse, rangeSliderWithStep, text)
 
 
 type alias UIModel =
     { selected : Int
+    , diagramWidth : Float
     , extents : ( Float, Float )
     }
 
@@ -32,16 +37,24 @@ type Msg
     = Select Int
     | SlideStart Float
     | SlideEnd Float
+    | Resize Float
+    | CheckResize
 
 
-fromSheet : List (Dict String String) -> Result (List String) Timeline
+timelineID =
+    "Timeline"
+
+
+fromSheet : List (Dict String String) -> Result (List String) ( Timeline, Cmd Msg )
 fromSheet sheet =
     Result.map2
         (\times titles ->
-            { titles = titles
-            , times = times
-            , ui = uiInit times
-            }
+            ( { titles = titles
+              , times = times
+              , ui = uiInit times
+              }
+            , getDiagramWidth
+            )
         )
         (TimelineRegion.listFromSheet sheet)
         (sheet
@@ -93,8 +106,16 @@ uiInit ls =
             ( floor floatStart, ceiling floatEnd )
     in
     { selected = -1
+    , diagramWidth = 1024
     , extents = ( toFloat startYear, toFloat endYear )
     }
+
+
+getDiagramWidth : Cmd Msg
+getDiagramWidth =
+    timelineID
+        |> Browser.Dom.getElement
+        |> Task.attempt (Result.map (.element >> .width) >> Result.withDefault 1024 >> Resize)
 
 
 floatExtents : List TimelineRegion -> ( Float, Float )
@@ -116,28 +137,40 @@ floatExtents =
         >> Maybe.withDefault ( 0, 0 )
 
 
-update : Msg -> Timeline -> Timeline
+update : Msg -> Timeline -> ( Timeline, Cmd Msg )
 update msg timeline =
-    { timeline | ui = updateHelper msg timeline timeline.ui }
+    let
+        ( newui, cmd ) =
+            updateHelper msg timeline timeline.ui
+    in
+    ( { timeline | ui = newui }, cmd )
 
 
-updateHelper : Msg -> Timeline -> UIModel -> UIModel
+updateHelper : Msg -> Timeline -> UIModel -> ( UIModel, Cmd Msg )
 updateHelper msg timeline ui =
     case msg of
         Select i ->
-            { ui
+            ( { ui
                 | selected =
                     Basics.clamp
                         (Basics.negate <| List.length timeline.titles)
                         (List.length timeline.times - 1)
                         i
-            }
+              }
+            , Cmd.none
+            )
 
         SlideStart newStart ->
-            { ui | extents = ( newStart, max (newStart + 0.1) <| Tuple.second ui.extents ) }
+            ( { ui | extents = ( newStart, max (newStart + 0.1) <| Tuple.second ui.extents ) }, Cmd.none )
 
         SlideEnd newEnd ->
-            { ui | extents = ( min (newEnd - 0.1) <| Tuple.first ui.extents, newEnd ) }
+            ( { ui | extents = ( min (newEnd - 0.1) <| Tuple.first ui.extents, newEnd ) }, Cmd.none )
+
+        Resize newWidth ->
+            ( { ui | diagramWidth = newWidth }, Cmd.none )
+
+        CheckResize ->
+            ( ui, getDiagramWidth )
 
 
 view : Timeline -> Html Msg
@@ -150,7 +183,7 @@ view timeline =
 
 
 viewDiagram : List TimelineRegion -> UIModel -> Html.Html Msg
-viewDiagram times { selected, extents } =
+viewDiagram times { selected, diagramWidth, extents } =
     let
         yearlist =
             times |> List.map (.start >> .year)
@@ -159,7 +192,7 @@ viewDiagram times { selected, extents } =
             extents
 
         widthscalar =
-            10 * 128 / (maxyear - minyear)
+            diagramWidth / (maxyear - minyear)
 
         timelineHeight =
             times
@@ -236,14 +269,20 @@ viewDiagram times { selected, extents } =
             , A.style "overflow" "hidden"
             , onClickNothingElse <| Select -1
             , A.style "background-color" "lightgrey"
+            , A.id "Timeline"
+            , E.on "resize" (JD.succeed CheckResize)
             ]
 
 
 viewControls : Timeline -> Html Msg
 viewControls timeline =
+    let
+        ( firstyear, lastyear ) =
+            floatExtents timeline.times
+    in
     Html.div []
         [ rangeSliderWithStep "Start date"
-            ( 2000, 2064, 0.1 )
+            ( firstyear, lastyear, 0.1 )
             False
             (String.toFloat
                 >> Maybe.withDefault (Tuple.first timeline.ui.extents)
@@ -251,7 +290,7 @@ viewControls timeline =
             )
             (Tuple.first timeline.ui.extents)
         , rangeSliderWithStep "End date"
-            ( 2000, 2064, 0.1 )
+            ( firstyear, lastyear, 0.1 )
             False
             (String.toFloat
                 >> Maybe.withDefault (Tuple.first timeline.ui.extents)

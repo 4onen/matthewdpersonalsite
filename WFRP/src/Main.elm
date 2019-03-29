@@ -51,17 +51,17 @@ update msg model =
         Response result ->
             case result of
                 Result.Ok val ->
-                    nocmd <|
-                        case Timeline.fromSheet val of
-                            Result.Ok timeline ->
-                                Loaded timeline
+                    case Timeline.fromSheet val of
+                        Result.Ok ( timeline, cmd ) ->
+                            ( Loaded timeline, Cmd.map TimelineMsg cmd )
 
-                            Result.Err err ->
-                                err
-                                    |> List.intersperse ","
-                                    |> List.foldl (++) ""
-                                    |> (\s -> "[" ++ s ++ "]")
-                                    |> Failure
+                        Result.Err err ->
+                            err
+                                |> List.intersperse ","
+                                |> List.foldl (++) ""
+                                |> (\s -> "[" ++ s ++ "]")
+                                |> Failure
+                                |> nocmd
 
                 Result.Err err ->
                     nocmd <| Failure <| stringifyHttpError err
@@ -72,7 +72,9 @@ update msg model =
         TimelineMsg tlmsg ->
             case model of
                 Loaded timeline ->
-                    ( Loaded <| Timeline.update tlmsg timeline, Cmd.none )
+                    Timeline.update tlmsg timeline
+                        |> Tuple.mapFirst Loaded
+                        |> Tuple.mapSecond (Cmd.map TimelineMsg)
 
                 _ ->
                     ( model, Cmd.none )

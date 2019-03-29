@@ -209,7 +209,6 @@ updateHelper msg timeline ui =
             in
             ( { ui
                 | extents =
-                    Debug.log "SlideStart"
                         ( if TimelineRegion.compareDates newStart end == LT then
                             newStart
 

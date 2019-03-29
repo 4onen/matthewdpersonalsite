@@ -1,4 +1,4 @@
-module GSheet exposing (Row, Table, getSheet)
+module GSheet exposing (Row, Table, getSheet, getSheetResponse)
 
 import Dict exposing (Dict)
 import Http
@@ -24,6 +24,14 @@ getSheet key tagger =
     Http.get
         { url = datasheet_url key
         , expect = Http.expectJson (errorSimplifier >> tagger) decoder
+        }
+
+
+getSheetResponse : String -> (Result Http.Error String -> msg) -> Cmd msg
+getSheetResponse key tagger =
+    Http.get
+        { url = datasheet_url key
+        , expect = Http.expectString tagger
         }
 
 

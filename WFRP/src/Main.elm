@@ -105,7 +105,7 @@ view model =
 
         Loaded timeline ->
             { title = "Timeline"
-            , body = reloadButton :: [ Html.map TimelineMsg <| Timeline.view timeline ]
+            , body = [ Html.map TimelineMsg <| Timeline.view timeline ]
             }
 
         Failure err ->

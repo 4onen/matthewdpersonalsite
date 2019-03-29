@@ -112,7 +112,7 @@ uiInit ls =
                 Nothing ->
                     let
                         defaultDate =
-                            { year = 0, month = Nothing, day = Nothing }
+                            { year = 0, month = Just 1, day = Just 1, time = Nothing }
                     in
                     Tuple.pair defaultDate defaultDate
     in
@@ -209,13 +209,13 @@ updateHelper msg timeline ui =
             in
             ( { ui
                 | extents =
-                        ( if TimelineRegion.compareDates newStart end == LT then
-                            newStart
+                    ( if TimelineRegion.compareDates newStart end == LT then
+                        newStart
 
-                          else
-                            begin
-                        , end
-                        )
+                      else
+                        begin
+                    , end
+                    )
               }
             , Cmd.none
             )
@@ -264,7 +264,7 @@ viewDiagram times { selected, diagramWidth, extents } =
             extents
 
         ( beginFlt, endFlt ) =
-            ( TimelineRegion.dateToFloat False beginExt, TimelineRegion.dateToFloat True endExt )
+            ( TimelineRegion.dateToFloat True beginExt, TimelineRegion.dateToFloat False endExt )
 
         widthscalar =
             diagramWidth / (endFlt - beginFlt)
@@ -356,7 +356,7 @@ viewControls : Timeline -> Html Msg
 viewControls timeline =
     let
         defaultDate =
-            { year = 0, month = Nothing, day = Nothing }
+            { year = 0, month = Nothing, day = Nothing, time = Nothing }
 
         ( begin, end ) =
             dateExtents timeline.times
@@ -445,7 +445,7 @@ viewSelected timeline =
                     |> List.head
                     |> Maybe.map
                         (\r ->
-                            ( r.headline, r.text, Just <| TimelineRegion.toTimeString r )
+                            ( r.headline, r.text, Just <| TimelineRegion.toTimeRegionString r )
                         )
 
              else

@@ -8,7 +8,7 @@ module TimelineRegion exposing
     , dateToFloat
     , floatExtents
     , listFromSheet
-    , toTimeString
+    , toTimeRegionString
     )
 
 import Dict exposing (Dict)
@@ -20,7 +20,11 @@ type alias Described a =
 
 
 type alias Date =
-    { year : Int, month : Maybe Int, day : Maybe Int }
+    { year : Int
+    , month : Maybe Int
+    , day : Maybe Int
+    , time : Maybe Int
+    }
 
 
 type RegionType
@@ -65,21 +69,29 @@ fromRow r =
     let
         getRowStartDate : Dict String String -> Result String Date
         getRowStartDate =
-            getRowDateObj "year" "month" "day"
+            getRowDateObj "year" "month" "day" "time"
 
         getRowEndDate : Dict String String -> Result String Date
         getRowEndDate =
-            getRowDateObj "endyear" "endmonth" "endday"
+            getRowDateObj "endyear" "endmonth" "endday" "endtime"
 
-        getRowDateObj : String -> String -> String -> Dict String String -> Result String Date
-        getRowDateObj yearkey monthkey daykey row =
+        getRowDateObj : String -> String -> String -> String -> Dict String String -> Result String Date
+        getRowDateObj yearkey monthkey daykey timekey row =
             Dict.get yearkey row
                 |> Result.fromMaybe "DateObj missing year"
                 |> Result.andThen (String.toInt >> Result.fromMaybe "DateObj year not an integer!")
                 |> Result.map
                     (\year ->
-                        Date year (Dict.get monthkey r |> Maybe.andThen String.toInt) (Dict.get daykey r |> Maybe.andThen String.toInt)
+                        Date
+                            year
+                            (Dict.get monthkey r |> Maybe.andThen String.toInt)
+                            (Dict.get daykey r |> Maybe.andThen String.toInt)
+                            (Dict.get timekey r |> Maybe.andThen String.toInt)
                     )
+
+        splitMilitary : Int -> ( Int, Int )
+        splitMilitary i =
+            ( i // 100, modBy 100 i )
     in
     Result.map2
         (\headline date ->
@@ -227,14 +239,14 @@ dateToFloat roundBegin d =
                 12
     in
     toFloat d.year
-        + toFloat ((d.month |> Maybe.withDefault defaultMonth)-1)
+        + toFloat ((d.month |> Maybe.withDefault defaultMonth) - 1)
         / 12.0
-        + toFloat ((d.day |> Maybe.withDefault defaultDay)-1)
+        + toFloat ((d.day |> Maybe.withDefault defaultDay) - 1)
         / (31.0 * 12.0)
 
 
-toTimeString : TimelineRegion -> String
-toTimeString r =
+toTimeRegionString : TimelineRegion -> String
+toTimeRegionString r =
     let
         startDateString =
             dateString r.start
@@ -253,7 +265,7 @@ toTimeString r =
 
 dateString : Date -> String
 dateString date =
-    case ( monthString date, dayString date ) of
+    (case ( monthString date, dayString date ) of
         ( Just monthName, Just dayName ) ->
             monthName ++ " " ++ dayName ++ ", " ++ String.fromInt date.year
 
@@ -262,6 +274,15 @@ dateString date =
 
         ( Nothing, _ ) ->
             String.fromInt date.year
+    )
+        |> (\dateName ->
+            case timeString date of
+                Just timeName ->
+                    timeName ++ " on "++dateName
+
+                Nothing ->
+                    dateName
+           )
 
 
 monthString : Date -> Maybe String
@@ -336,4 +357,46 @@ dayString =
 
                     n ->
                         String.fromInt n ++ "th"
+            )
+
+
+timeString : Date -> Maybe String
+timeString =
+    .time
+        >> Maybe.map
+            (\time ->
+                case time of
+                    1200 ->
+                        "12:00pm"
+
+                    0 ->
+                        "00:00am"
+
+                    _ ->
+                        let
+                            hour =
+                                time // 100
+
+                            minute =
+                                modBy 100 time
+
+                            pm =
+                                time > 12
+
+                            pmAppliedHour =
+                                if pm then
+                                    hour - 12
+
+                                else
+                                    hour
+                        in
+                        String.fromInt pmAppliedHour
+                            ++ ":"
+                            ++ String.fromInt minute
+                            ++ (if pm then
+                                    "pm"
+
+                                else
+                                    "am"
+                               )
             )

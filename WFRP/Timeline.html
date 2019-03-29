@@ -610,11 +610,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.a6.M === region.ag.M)
+	if (region.a9.N === region.ah.N)
 	{
-		return 'on line ' + region.a6.M;
+		return 'on line ' + region.a9.N;
 	}
-	return 'on lines ' + region.a6.M + ' through ' + region.ag.M;
+	return 'on lines ' + region.a9.N + ' through ' + region.ah.N;
 }
 
 
@@ -1997,9 +1997,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aW,
-		impl.ba,
-		impl.a9,
+		impl.aZ,
+		impl.bd,
+		impl.bc,
 		function() { return function() {} }
 	);
 });
@@ -2461,19 +2461,19 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.aR.a(response)));
+			callback(toTask(request.aj.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done(elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done(elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.aR.b, xhr)); });
-		elm$core$Maybe$isJust(request.p) && _Http_track(router, xhr, request.p.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.aj.b, xhr)); });
+		elm$core$Maybe$isJust(request.o) && _Http_track(router, xhr, request.o.a);
 
 		try {
-			xhr.open(request.m, request.bb, true);
+			xhr.open(request.m, request.aP, true);
 		} catch (e) {
-			return done(elm$http$Http$BadUrl_(request.bb));
+			return done(elm$http$Http$BadUrl_(request.aP));
 		}
 
 		_Http_configureRequest(xhr, request);
@@ -2490,13 +2490,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.j; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.i; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
 	xhr.timeout = request.n.a || 0;
-	xhr.responseType = request.aR.d;
-	xhr.withCredentials = request.B;
+	xhr.responseType = request.aj.d;
+	xhr.withCredentials = request.C;
 }
 
 
@@ -2517,10 +2517,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		bb: xhr.responseURL,
-		aI: xhr.status,
-		a7: xhr.statusText,
-		j: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		aP: xhr.responseURL,
+		aK: xhr.status,
+		ba: xhr.statusText,
+		i: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -2615,14 +2615,14 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2(elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, elm$http$Http$Sending({
-			a5: event.loaded,
+			a8: event.loaded,
 			aa: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2(elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, elm$http$Http$Receiving({
-			a3: event.loaded,
+			a6: event.loaded,
 			aa: event.lengthComputable ? elm$core$Maybe$Just(event.total) : elm$core$Maybe$Nothing
 		}))));
 	});
@@ -2974,9 +2974,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		aY: func(record.aY),
-		a8: record.a8,
-		a1: record.a1
+		a$: func(record.a$),
+		bb: record.bb,
+		a4: record.a4
 	}
 });
 
@@ -3244,11 +3244,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.aY;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.a8;
+		var message = !tag ? value : tag < 3 ? value.a : value.a$;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.bb;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.a1) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.a4) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -4198,11 +4198,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aW,
-		impl.ba,
-		impl.a9,
+		impl.aZ,
+		impl.bd,
+		impl.bc,
 		function(sendToApp, initialModel) {
-			var view = impl.bc;
+			var view = impl.be;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -4234,12 +4234,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aW,
-		impl.ba,
-		impl.a9,
+		impl.aZ,
+		impl.bd,
+		impl.bc,
 		function(sendToApp, initialModel) {
 			var divertHrefToApp = impl.O && impl.O(sendToApp)
-			var view = impl.bc;
+			var view = impl.be;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -4308,8 +4308,8 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.a_;
-	var onUrlRequest = impl.a$;
+	var onUrlChange = impl.a1;
+	var onUrlRequest = impl.a2;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
@@ -4329,9 +4329,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ax === next.ax
-							&& curr.am === next.am
-							&& curr.au.a === next.au.a
+							&& curr.az === next.az
+							&& curr.ao === next.ao
+							&& curr.aw.a === next.aw.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4339,13 +4339,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aW: function(flags)
+		aZ: function(flags)
 		{
-			return A3(impl.aW, flags, _Browser_getUrl(), key);
+			return A3(impl.aZ, flags, _Browser_getUrl(), key);
 		},
-		bc: impl.bc,
-		ba: impl.ba,
-		a9: impl.a9
+		be: impl.be,
+		bd: impl.bd,
+		bc: impl.bc
 	});
 }
 
@@ -4411,17 +4411,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aU: 'hidden', aO: 'visibilitychange' }
+		? { aX: 'hidden', aS: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aU: 'mozHidden', aO: 'mozvisibilitychange' }
+		? { aX: 'mozHidden', aS: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aU: 'msHidden', aO: 'msvisibilitychange' }
+		? { aX: 'msHidden', aS: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aU: 'webkitHidden', aO: 'webkitvisibilitychange' }
-		: { aU: 'hidden', aO: 'visibilitychange' };
+		? { aX: 'webkitHidden', aS: 'webkitvisibilitychange' }
+		: { aX: 'hidden', aS: 'visibilitychange' };
 }
 
 
@@ -4502,12 +4502,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aF: _Browser_getScene(),
-		aM: {
+		aH: _Browser_getScene(),
+		aQ: {
 			W: _Browser_window.pageXOffset,
 			X: _Browser_window.pageYOffset,
-			bd: _Browser_doc.documentElement.clientWidth,
-			D: _Browser_doc.documentElement.clientHeight
+			bf: _Browser_doc.documentElement.clientWidth,
+			E: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4517,8 +4517,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		bd: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		D: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		bf: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		E: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4541,15 +4541,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aF: {
-				bd: node.scrollWidth,
-				D: node.scrollHeight
+			aH: {
+				bf: node.scrollWidth,
+				E: node.scrollHeight
 			},
-			aM: {
+			aQ: {
 				W: node.scrollLeft,
 				X: node.scrollTop,
-				bd: node.clientWidth,
-				D: node.clientHeight
+				bf: node.clientWidth,
+				E: node.clientHeight
 			}
 		};
 	});
@@ -4579,18 +4579,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aF: _Browser_getScene(),
-			aM: {
+			aH: _Browser_getScene(),
+			aQ: {
 				W: x,
 				X: y,
-				bd: _Browser_doc.documentElement.clientWidth,
-				D: _Browser_doc.documentElement.clientHeight
+				bf: _Browser_doc.documentElement.clientWidth,
+				E: _Browser_doc.documentElement.clientHeight
 			},
-			aQ: {
+			aU: {
 				W: x + rect.left,
 				X: y + rect.top,
-				bd: rect.width,
-				D: rect.height
+				bf: rect.width,
+				E: rect.height
 			}
 		};
 	});
@@ -4792,7 +4792,7 @@ var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 					elm$parser$Parser$Advanced$Good,
 					_Utils_cmp(s0.b, offset) < 0,
 					0,
-					{af: col, c: s0.c, d: s0.d, b: offset, aE: row, a: s0.a});
+					{af: col, c: s0.c, d: s0.d, b: offset, aG: row, a: s0.a});
 			} else {
 				if (_Utils_eq(newOffset, -2)) {
 					var $temp$isGood = isGood,
@@ -4824,7 +4824,7 @@ var elm$parser$Parser$Advanced$chompWhileHelp = F5(
 	});
 var elm$parser$Parser$Advanced$chompWhile = function (isGood) {
 	return function (s) {
-		return A5(elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.b, s.aE, s.af, s);
+		return A5(elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.b, s.aG, s.af, s);
 	};
 };
 var elm$parser$Parser$chompWhile = elm$parser$Parser$Advanced$chompWhile;
@@ -4835,7 +4835,7 @@ var elm$parser$Parser$Advanced$AddRight = F2(
 	});
 var elm$parser$Parser$Advanced$DeadEnd = F4(
 	function (row, col, problem, contextStack) {
-		return {af: col, aP: contextStack, a2: problem, aE: row};
+		return {af: col, aT: contextStack, a5: problem, aG: row};
 	});
 var elm$parser$Parser$Advanced$Empty = {$: 0};
 var elm$parser$Parser$Advanced$fromState = F2(
@@ -4843,7 +4843,7 @@ var elm$parser$Parser$Advanced$fromState = F2(
 		return A2(
 			elm$parser$Parser$Advanced$AddRight,
 			elm$parser$Parser$Advanced$Empty,
-			A4(elm$parser$Parser$Advanced$DeadEnd, s.aE, s.af, x, s.c));
+			A4(elm$parser$Parser$Advanced$DeadEnd, s.aG, s.af, x, s.c));
 	});
 var elm$parser$Parser$Advanced$end = function (x) {
 	return function (s) {
@@ -5089,7 +5089,7 @@ var elm$parser$Parser$Advanced$token = function (_n0) {
 	var expecting = _n0.b;
 	var progress = !elm$core$String$isEmpty(str);
 	return function (s) {
-		var _n1 = A5(elm$parser$Parser$Advanced$isSubString, str, s.b, s.aE, s.af, s.a);
+		var _n1 = A5(elm$parser$Parser$Advanced$isSubString, str, s.b, s.aG, s.af, s.a);
 		var newOffset = _n1.a;
 		var newRow = _n1.b;
 		var newCol = _n1.c;
@@ -5100,7 +5100,7 @@ var elm$parser$Parser$Advanced$token = function (_n0) {
 			elm$parser$Parser$Advanced$Good,
 			progress,
 			0,
-			{af: newCol, c: s.c, d: s.d, b: newOffset, aE: newRow, a: s.a});
+			{af: newCol, c: s.c, d: s.d, b: newOffset, aG: newRow, a: s.a});
 	};
 };
 var elm$parser$Parser$Advanced$symbol = elm$parser$Parser$Advanced$token;
@@ -5785,10 +5785,10 @@ var elm$core$List$map = F2(
 	});
 var elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
-		return {af: col, a2: problem, aE: row};
+		return {af: col, a5: problem, aG: row};
 	});
 var elm$parser$Parser$problemToDeadEnd = function (p) {
-	return A3(elm$parser$Parser$DeadEnd, p.aE, p.af, p.a2);
+	return A3(elm$parser$Parser$DeadEnd, p.aG, p.af, p.a5);
 };
 var elm$parser$Parser$Advanced$bagToList = F2(
 	function (bag, list) {
@@ -5820,7 +5820,7 @@ var elm$parser$Parser$Advanced$run = F2(
 	function (_n0, src) {
 		var parse = _n0;
 		var _n1 = parse(
-			{af: 1, c: _List_Nil, d: 1, b: 0, aE: 1, a: src});
+			{af: 1, c: _List_Nil, d: 1, b: 0, aG: 1, a: src});
 		if (!_n1.$) {
 			var value = _n1.b;
 			return elm$core$Result$Ok(value);
@@ -5954,7 +5954,7 @@ var author$project$GSheet$errorSimplifier = function (result) {
 									A2(
 										elm$core$Basics$composeR,
 										function ($) {
-											return $.a2;
+											return $.a5;
 										},
 										stringifyProblem),
 									err)) + '\n\n');
@@ -6459,7 +6459,7 @@ var elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return elm$core$Result$Err(
-					elm$http$Http$BadStatus(metadata.aI));
+					elm$http$Http$BadStatus(metadata.aK));
 			default:
 				var body = response.b;
 				return A2(
@@ -6489,7 +6489,7 @@ var elm$http$Http$Request = function (a) {
 var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {aA: reqs, aJ: subs};
+		return {aC: reqs, aL: subs};
 	});
 var elm$http$Http$init = elm$core$Task$succeed(
 	A2(elm$http$Http$State, elm$core$Dict$empty, _List_Nil));
@@ -6534,7 +6534,7 @@ var elm$http$Http$updateReqs = F3(
 					return A2(
 						elm$core$Task$andThen,
 						function (pid) {
-							var _n4 = req.p;
+							var _n4 = req.o;
 							if (_n4.$ === 1) {
 								return A3(elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6564,7 +6564,7 @@ var elm$http$Http$onEffects = F4(
 				return elm$core$Task$succeed(
 					A2(elm$http$Http$State, reqs, subs));
 			},
-			A3(elm$http$Http$updateReqs, router, cmds, state.aA));
+			A3(elm$http$Http$updateReqs, router, cmds, state.aC));
 	});
 var elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6629,7 +6629,7 @@ var elm$http$Http$onSelfMsg = F3(
 				A2(
 					elm$core$List$filterMap,
 					A3(elm$http$Http$maybeSend, router, tracker, progress),
-					state.aJ)));
+					state.aL)));
 	});
 var elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6643,14 +6643,14 @@ var elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return elm$http$Http$Request(
 				{
-					B: r.B,
+					C: r.C,
 					Y: r.Y,
-					aR: A2(_Http_mapExpect, func, r.aR),
-					j: r.j,
+					aj: A2(_Http_mapExpect, func, r.aj),
+					i: r.i,
 					m: r.m,
 					n: r.n,
-					p: r.p,
-					bb: r.bb
+					o: r.o,
+					aP: r.aP
 				});
 		}
 	});
@@ -6673,21 +6673,21 @@ var elm$http$Http$subscription = _Platform_leaf('Http');
 var elm$http$Http$request = function (r) {
 	return elm$http$Http$command(
 		elm$http$Http$Request(
-			{B: false, Y: r.Y, aR: r.aR, j: r.j, m: r.m, n: r.n, p: r.p, bb: r.bb}));
+			{C: false, Y: r.Y, aj: r.aj, i: r.i, m: r.m, n: r.n, o: r.o, aP: r.aP}));
 };
 var elm$http$Http$get = function (r) {
 	return elm$http$Http$request(
-		{Y: elm$http$Http$emptyBody, aR: r.aR, j: _List_Nil, m: 'GET', n: elm$core$Maybe$Nothing, p: elm$core$Maybe$Nothing, bb: r.bb});
+		{Y: elm$http$Http$emptyBody, aj: r.aj, i: _List_Nil, m: 'GET', n: elm$core$Maybe$Nothing, o: elm$core$Maybe$Nothing, aP: r.aP});
 };
 var author$project$GSheet$getSheet = F2(
 	function (key, tagger) {
 		return elm$http$Http$get(
 			{
-				aR: A2(
+				aj: A2(
 					elm$http$Http$expectJson,
 					A2(elm$core$Basics$composeR, author$project$GSheet$errorSimplifier, tagger),
 					author$project$GSheet$decoder),
-				bb: author$project$GSheet$datasheet_url(key)
+				aP: author$project$GSheet$datasheet_url(key)
 			});
 	});
 var author$project$Main$Loading = {$: 0};
@@ -6839,7 +6839,7 @@ var elm$core$String$contains = _String_contains;
 var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ak: fragment, am: host, as: path, au: port_, ax: protocol, ay: query};
+		return {am: fragment, ao: host, au: path, aw: port_, az: protocol, aA: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {
@@ -6984,33 +6984,54 @@ var author$project$Timeline$getDiagramWidth = A2(
 			A2(
 				elm$core$Basics$composeR,
 				function ($) {
-					return $.aQ;
+					return $.aU;
 				},
 				function ($) {
-					return $.bd;
+					return $.bf;
 				})),
 		A2(
 			elm$core$Basics$composeR,
 			elm$core$Result$withDefault(1024),
 			author$project$Timeline$Resize)),
 	elm$browser$Browser$Dom$getElement(author$project$Timeline$timelineID));
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
+var author$project$TimelineRegion$compareMaybesWith = F3(
+	function (f, a, b) {
+		var _n0 = _Utils_Tuple2(a, b);
+		if (!_n0.a.$) {
+			if (!_n0.b.$) {
+				var aval = _n0.a.a;
+				var bval = _n0.b.a;
+				return A2(f, aval, bval);
+			} else {
+				var aval = _n0.a.a;
+				var _n2 = _n0.b;
+				return 2;
+			}
 		} else {
-			return _default;
+			if (!_n0.b.$) {
+				var _n1 = _n0.a;
+				var bval = _n0.b.a;
+				return 0;
+			} else {
+				var _n3 = _n0.a;
+				var _n4 = _n0.b;
+				return 1;
+			}
 		}
 	});
-var author$project$TimelineRegion$dateToFloat = F2(
-	function (roundBegin, d) {
-		var defaultMonth = roundBegin ? 0 : 12;
-		var defaultDay = roundBegin ? 0 : 31;
-		return (d.bf + (A2(elm$core$Maybe$withDefault, defaultMonth, d.N) / 12.0)) + (A2(elm$core$Maybe$withDefault, defaultDay, d.K) / (31.0 * 12.0));
+var author$project$TimelineRegion$compareMaybes = author$project$TimelineRegion$compareMaybesWith(elm$core$Basics$compare);
+var author$project$TimelineRegion$compareDates = F2(
+	function (a, b) {
+		var compyear = A2(elm$core$Basics$compare, a.p, b.p);
+		if (compyear !== 1) {
+			return compyear;
+		} else {
+			var compmonth = A2(author$project$TimelineRegion$compareMaybes, a.F, b.F);
+			return (compmonth !== 1) ? compmonth : A2(author$project$TimelineRegion$compareMaybes, a.ag, b.ag);
+		}
 	});
 var author$project$TimelineRegion$getEnd = function (r) {
-	var _n0 = r.ag;
+	var _n0 = r.ah;
 	switch (_n0.$) {
 		case 0:
 			var date = _n0.a;
@@ -7022,73 +7043,89 @@ var author$project$TimelineRegion$getEnd = function (r) {
 			return elm$core$Maybe$Nothing;
 	}
 };
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
 		if (!maybe.$) {
 			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
+			return value;
 		} else {
-			return elm$core$Maybe$Nothing;
+			return _default;
 		}
 	});
-var author$project$TimelineRegion$floatExtents = function (r) {
-	var end = A2(
-		elm$core$Maybe$map,
-		author$project$TimelineRegion$dateToFloat(false),
-		author$project$TimelineRegion$getEnd(r));
-	var begin = A2(author$project$TimelineRegion$dateToFloat, true, r.a6);
+var author$project$TimelineRegion$dateExtents = function (r) {
 	return _Utils_Tuple2(
-		begin,
-		A2(elm$core$Maybe$withDefault, begin, end));
+		r.a9,
+		A2(
+			elm$core$Maybe$withDefault,
+			r.a9,
+			author$project$TimelineRegion$getEnd(r)));
 };
-var elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var author$project$Timeline$floatExtents = A2(
-	elm$core$Basics$composeR,
-	A2(
-		elm$core$List$foldl,
-		F2(
-			function (r, maybeExtents) {
-				if (maybeExtents.$ === 1) {
-					return elm$core$Maybe$Just(
-						author$project$TimelineRegion$floatExtents(r));
-				} else {
-					var _n1 = maybeExtents.a;
-					var least = _n1.a;
-					var greatest = _n1.b;
-					var _n2 = author$project$TimelineRegion$floatExtents(r);
-					var rbegin = _n2.a;
-					var rend = _n2.b;
-					return elm$core$Maybe$Just(
-						_Utils_Tuple2(
-							A2(elm$core$Basics$min, rbegin, least),
-							A2(elm$core$Basics$max, rend, greatest)));
-				}
-			}),
-		elm$core$Maybe$Nothing),
-	elm$core$Maybe$withDefault(
-		_Utils_Tuple2(0, 0)));
+var author$project$Timeline$dateExtents = A2(
+	elm$core$List$foldl,
+	F2(
+		function (r, maybeExtents) {
+			if (maybeExtents.$ === 1) {
+				return elm$core$Maybe$Just(
+					author$project$TimelineRegion$dateExtents(r));
+			} else {
+				var _n1 = maybeExtents.a;
+				var begin = _n1.a;
+				var end = _n1.b;
+				var _n2 = author$project$TimelineRegion$dateExtents(r);
+				var nbegin = _n2.a;
+				var nend = _n2.b;
+				return elm$core$Maybe$Just(
+					_Utils_Tuple2(
+						function () {
+							var _n3 = A2(author$project$TimelineRegion$compareDates, nbegin, begin);
+							if (!_n3) {
+								return nbegin;
+							} else {
+								return begin;
+							}
+						}(),
+						function () {
+							var _n4 = A2(author$project$TimelineRegion$compareDates, nend, end);
+							if (_n4 === 2) {
+								return nend;
+							} else {
+								return end;
+							}
+						}()));
+			}
+		}),
+	elm$core$Maybe$Nothing);
 var author$project$Timeline$uiInit = function (ls) {
-	var _n0 = author$project$Timeline$floatExtents(ls);
-	var floatStart = _n0.a;
-	var floatEnd = _n0.b;
-	var _n1 = _Utils_Tuple2(
-		elm$core$Basics$floor(floatStart),
-		elm$core$Basics$ceiling(floatEnd));
-	var startYear = _n1.a;
-	var endYear = _n1.b;
+	var _n0 = function () {
+		var _n1 = author$project$Timeline$dateExtents(ls);
+		if (!_n1.$) {
+			var dates = _n1.a;
+			return dates;
+		} else {
+			var defaultDate = {
+				ag: elm$core$Maybe$Just(1),
+				F: elm$core$Maybe$Just(1),
+				aN: elm$core$Maybe$Nothing,
+				p: 0
+			};
+			return A2(elm$core$Tuple$pair, defaultDate, defaultDate);
+		}
+	}();
+	var begin = _n0.a;
+	var end = _n0.b;
 	return {
 		T: 1024,
-		o: _Utils_Tuple2(startYear, endYear),
-		s: -1
+		q: _Utils_Tuple2(
+			begin,
+			_Utils_update(
+				end,
+				{p: end.p + 1})),
+		t: -1
 	};
 };
-var author$project$TimelineRegion$Date = F3(
-	function (year, month, day) {
-		return {K: day, N: month, bf: year};
+var author$project$TimelineRegion$Date = F4(
+	function (year, month, day, time) {
+		return {ag: day, F: month, aN: time, p: year};
 	});
 var author$project$TimelineRegion$Era = function (a) {
 	return {$: 1, a: a};
@@ -7097,6 +7134,7 @@ var author$project$TimelineRegion$Point = {$: 2};
 var author$project$TimelineRegion$Region = function (a) {
 	return {$: 0, a: a};
 };
+var elm$core$Basics$modBy = _Basics_modBy;
 var elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (!maybeValue.$) {
@@ -7143,12 +7181,17 @@ var elm$core$Result$map2 = F3(
 		}
 	});
 var author$project$TimelineRegion$fromRow = function (r) {
-	var getRowDateObj = F4(
-		function (yearkey, monthkey, daykey, row) {
+	var splitMilitary = function (i) {
+		return _Utils_Tuple2(
+			(i / 100) | 0,
+			A2(elm$core$Basics$modBy, 100, i));
+	};
+	var getRowDateObj = F5(
+		function (yearkey, monthkey, daykey, timekey, row) {
 			return A2(
 				elm$core$Result$map,
 				function (year) {
-					return A3(
+					return A4(
 						author$project$TimelineRegion$Date,
 						year,
 						A2(
@@ -7158,7 +7201,11 @@ var author$project$TimelineRegion$fromRow = function (r) {
 						A2(
 							elm$core$Maybe$andThen,
 							elm$core$String$toInt,
-							A2(elm$core$Dict$get, daykey, r)));
+							A2(elm$core$Dict$get, daykey, r)),
+						A2(
+							elm$core$Maybe$andThen,
+							elm$core$String$toInt,
+							A2(elm$core$Dict$get, timekey, r)));
 				},
 				A2(
 					elm$core$Result$andThen,
@@ -7171,14 +7218,14 @@ var author$project$TimelineRegion$fromRow = function (r) {
 						'DateObj missing year',
 						A2(elm$core$Dict$get, yearkey, row))));
 		});
-	var getRowEndDate = A3(getRowDateObj, 'endyear', 'endmonth', 'endday');
-	var getRowStartDate = A3(getRowDateObj, 'year', 'month', 'day');
+	var getRowEndDate = A4(getRowDateObj, 'endyear', 'endmonth', 'endday', 'endtime');
+	var getRowStartDate = A4(getRowDateObj, 'year', 'month', 'day', 'time');
 	return A3(
 		elm$core$Result$map2,
 		F2(
 			function (headline, date) {
 				return {
-					ag: function () {
+					ah: function () {
 						var _n0 = getRowEndDate(r);
 						if (!_n0.$) {
 							var enddate = _n0.a;
@@ -7192,8 +7239,8 @@ var author$project$TimelineRegion$fromRow = function (r) {
 							return author$project$TimelineRegion$Point;
 						}
 					}(),
-					L: headline,
-					a6: date,
+					M: headline,
+					a9: date,
 					U: A2(elm$core$Dict$get, 'text', r)
 				};
 			}),
@@ -7203,49 +7250,13 @@ var author$project$TimelineRegion$fromRow = function (r) {
 			A2(elm$core$Dict$get, 'headline', r)),
 		getRowStartDate(r));
 };
-var author$project$TimelineRegion$compareMaybesWith = F3(
-	function (f, a, b) {
-		var _n0 = _Utils_Tuple2(a, b);
-		if (!_n0.a.$) {
-			if (!_n0.b.$) {
-				var aval = _n0.a.a;
-				var bval = _n0.b.a;
-				return A2(f, aval, bval);
-			} else {
-				var aval = _n0.a.a;
-				var _n2 = _n0.b;
-				return 2;
-			}
-		} else {
-			if (!_n0.b.$) {
-				var _n1 = _n0.a;
-				var bval = _n0.b.a;
-				return 0;
-			} else {
-				var _n3 = _n0.a;
-				var _n4 = _n0.b;
-				return 1;
-			}
-		}
-	});
-var author$project$TimelineRegion$compareMaybes = author$project$TimelineRegion$compareMaybesWith(elm$core$Basics$compare);
-var author$project$TimelineRegion$compareDates = F2(
-	function (a, b) {
-		var compyear = A2(elm$core$Basics$compare, a.bf, b.bf);
-		if (compyear !== 1) {
-			return compyear;
-		} else {
-			var compmonth = A2(author$project$TimelineRegion$compareMaybes, a.N, b.N);
-			return (compmonth !== 1) ? compmonth : A2(author$project$TimelineRegion$compareMaybes, a.K, b.K);
-		}
-	});
 var author$project$TimelineRegion$compare = F2(
 	function (a, b) {
-		var compstart = A2(author$project$TimelineRegion$compareDates, a.a6, b.a6);
+		var compstart = A2(author$project$TimelineRegion$compareDates, a.a9, b.a9);
 		if (compstart !== 1) {
 			return compstart;
 		} else {
-			var _n0 = _Utils_Tuple2(a.ag, b.ag);
+			var _n0 = _Utils_Tuple2(a.ah, b.ah);
 			_n0$1:
 			while (true) {
 				_n0$2:
@@ -7356,9 +7367,9 @@ var author$project$Timeline$fromSheet = function (sheet) {
 			function (times, titles) {
 				return _Utils_Tuple2(
 					{
-						H: times,
+						J: times,
 						V: titles,
-						i: author$project$Timeline$uiInit(times)
+						k: author$project$Timeline$uiInit(times)
 					},
 					author$project$Timeline$getDiagramWidth);
 			}),
@@ -7407,7 +7418,7 @@ var author$project$Timeline$fromSheet = function (sheet) {
 								return elm$core$Result$Ok(
 									elm$core$Maybe$Just(
 										{
-											L: str,
+											M: str,
 											U: A2(elm$core$Dict$get, 'text', r)
 										}));
 							} else {
@@ -7423,10 +7434,6 @@ var elm$core$Basics$clamp = F3(
 	function (low, high, number) {
 		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
 	});
-var elm$core$Tuple$second = function (_n0) {
-	var y = _n0.b;
-	return y;
-};
 var author$project$Timeline$updateHelper = F3(
 	function (msg, timeline, ui) {
 		switch (msg.$) {
@@ -7436,33 +7443,39 @@ var author$project$Timeline$updateHelper = F3(
 					_Utils_update(
 						ui,
 						{
-							s: A3(
+							t: A3(
 								elm$core$Basics$clamp,
 								-elm$core$List$length(timeline.V),
-								elm$core$List$length(timeline.H) - 1,
+								elm$core$List$length(timeline.J) - 1,
 								i)
 						}),
 					elm$core$Platform$Cmd$none);
 			case 1:
 				var newStart = msg.a;
+				var _n1 = ui.q;
+				var begin = _n1.a;
+				var end = _n1.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						ui,
 						{
-							o: _Utils_Tuple2(
-								newStart,
-								A2(elm$core$Basics$max, newStart + 0.1, ui.o.b))
+							q: _Utils_Tuple2(
+								(!A2(author$project$TimelineRegion$compareDates, newStart, end)) ? newStart : begin,
+								end)
 						}),
 					elm$core$Platform$Cmd$none);
 			case 2:
 				var newEnd = msg.a;
+				var _n2 = ui.q;
+				var begin = _n2.a;
+				var end = _n2.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						ui,
 						{
-							o: _Utils_Tuple2(
-								A2(elm$core$Basics$min, newEnd - 0.1, ui.o.a),
-								newEnd)
+							q: _Utils_Tuple2(
+								begin,
+								(A2(author$project$TimelineRegion$compareDates, newEnd, begin) === 2) ? newEnd : end)
 						}),
 					elm$core$Platform$Cmd$none);
 			case 3:
@@ -7478,13 +7491,13 @@ var author$project$Timeline$updateHelper = F3(
 	});
 var author$project$Timeline$update = F2(
 	function (msg, timeline) {
-		var _n0 = A3(author$project$Timeline$updateHelper, msg, timeline, timeline.i);
+		var _n0 = A3(author$project$Timeline$updateHelper, msg, timeline, timeline.k);
 		var newui = _n0.a;
 		var cmd = _n0.b;
 		return _Utils_Tuple2(
 			_Utils_update(
 				timeline,
-				{i: newui}),
+				{k: newui}),
 			cmd);
 	});
 var elm$core$Platform$Cmd$map = _Platform_map;
@@ -7587,6 +7600,7 @@ var author$project$Main$reloadButton = A2(
 		[
 			elm$html$Html$text('Reload')
 		]));
+var author$project$Timeline$CheckResize = {$: 4};
 var author$project$Timeline$Select = function (a) {
 	return {$: 0, a: a};
 };
@@ -7596,9 +7610,15 @@ var author$project$Timeline$SlideEnd = function (a) {
 var author$project$Timeline$SlideStart = function (a) {
 	return {$: 1, a: a};
 };
+var author$project$TimelineRegion$dateToFloat = F2(
+	function (roundBegin, d) {
+		var defaultMonth = roundBegin ? 1 : 12;
+		var defaultDay = roundBegin ? 1 : 31;
+		return (d.p + ((A2(elm$core$Maybe$withDefault, defaultMonth, d.F) - 1) / 12.0)) + ((A2(elm$core$Maybe$withDefault, defaultDay, d.ag) - 1) / (31.0 * 12.0));
+	});
 var elm$core$String$fromFloat = _String_fromNumber;
-var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$input = _VirtualDom_node('input');
+var elm$html$Html$span = _VirtualDom_node('span');
 var elm$json$Json$Encode$bool = _Json_wrap;
 var elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -7650,17 +7670,16 @@ var elm$html$Html$Events$onInput = function (tagger) {
 			elm$html$Html$Events$alwaysStop,
 			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
 };
-var author$project$ViewUtil$rangeSliderWithStep = F5(
-	function (name, _n0, disable, onInput, value) {
+var author$project$ViewUtil$rangeSliderWithStep = F4(
+	function (_n0, disable, onInput, value) {
 		var min = _n0.a;
 		var max = _n0.b;
 		var step = _n0.c;
 		return A2(
-			elm$html$Html$div,
+			elm$html$Html$span,
 			_List_Nil,
 			_List_fromArray(
 				[
-					elm$html$Html$text(name),
 					A2(
 					elm$html$Html$input,
 					_List_fromArray(
@@ -7699,67 +7718,200 @@ var author$project$ViewUtil$rangeSliderWithStep = F5(
 					_List_Nil)
 				]));
 	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
 var elm$core$String$toFloat = _String_toFloat;
+var elm$html$Html$div = _VirtualDom_node('div');
 var author$project$Timeline$viewControls = function (timeline) {
-	var _n0 = author$project$Timeline$floatExtents(timeline.H);
-	var firstyear = _n0.a;
-	var lastyear = _n0.b;
+	var defaultDate = {ag: elm$core$Maybe$Nothing, F: elm$core$Maybe$Nothing, aN: elm$core$Maybe$Nothing, p: 0};
+	var _n0 = timeline.k.q;
+	var uibegin = _n0.a;
+	var uiend = _n0.b;
+	var _n1 = A2(
+		elm$core$Maybe$withDefault,
+		_Utils_Tuple2(defaultDate, defaultDate),
+		author$project$Timeline$dateExtents(timeline.J));
+	var begin = _n1.a;
+	var end = _n1.b;
+	var _n2 = _Utils_Tuple2(
+		elm$core$Basics$floor(
+			A2(author$project$TimelineRegion$dateToFloat, true, begin)),
+		elm$core$Basics$ceiling(
+			A2(author$project$TimelineRegion$dateToFloat, false, end)));
+	var firstyear = _n2.a;
+	var lastyear = _n2.b;
 	return A2(
 		elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
-				A5(
-				author$project$ViewUtil$rangeSliderWithStep,
-				'Start date',
-				_Utils_Tuple3(firstyear, lastyear, 0.1),
-				false,
-				A2(
-					elm$core$Basics$composeR,
-					elm$core$String$toFloat,
-					A2(
-						elm$core$Basics$composeR,
-						elm$core$Maybe$withDefault(timeline.i.o.a),
-						author$project$Timeline$SlideStart)),
-				timeline.i.o.a),
-				A5(
-				author$project$ViewUtil$rangeSliderWithStep,
-				'End date',
-				_Utils_Tuple3(firstyear, lastyear, 0.1),
-				false,
-				A2(
-					elm$core$Basics$composeR,
-					elm$core$String$toFloat,
-					A2(
-						elm$core$Basics$composeR,
-						elm$core$Maybe$withDefault(timeline.i.o.a),
-						author$project$Timeline$SlideEnd)),
-				timeline.i.o.b),
 				A2(
 				elm$html$Html$button,
 				_List_fromArray(
 					[
-						elm$html$Html$Events$onClick(
-						author$project$Timeline$Select(timeline.i.s - 1))
+						elm$html$Html$Events$onClick(author$project$Timeline$CheckResize)
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text('Previous << ')
+						elm$html$Html$text('Resize Timeline')
 					])),
 				A2(
-				elm$html$Html$button,
+				elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$Events$onClick(
-						author$project$Timeline$Select(timeline.i.s + 1))
-					]),
+						A4(
+						author$project$ViewUtil$rangeSliderWithStep,
+						_Utils_Tuple3(firstyear, lastyear, 1),
+						false,
+						A2(
+							elm$core$Basics$composeR,
+							elm$core$String$toFloat,
+							A2(
+								elm$core$Basics$composeR,
+								elm$core$Maybe$withDefault(
+									function ($) {
+										return $.p;
+									}(timeline.k.q.a)),
+								A2(
+									elm$core$Basics$composeR,
+									elm$core$Basics$floor,
+									function (y) {
+										return author$project$Timeline$SlideStart(
+											_Utils_update(
+												uibegin,
+												{p: y}));
+									}))),
+						uibegin.p),
+						A4(
+						author$project$ViewUtil$rangeSliderWithStep,
+						_Utils_Tuple3(1, 12, 1),
+						false,
+						A2(
+							elm$core$Basics$composeR,
+							elm$core$String$toFloat,
+							A2(
+								elm$core$Basics$composeR,
+								elm$core$Maybe$map(elm$core$Basics$floor),
+								A2(
+									elm$core$Basics$composeR,
+									elm$core$Maybe$withDefault(1),
+									A2(
+										elm$core$Basics$composeR,
+										A2(elm$core$Basics$clamp, 1, 12),
+										function (y) {
+											return author$project$Timeline$SlideStart(
+												_Utils_update(
+													uibegin,
+													{
+														F: elm$core$Maybe$Just(y)
+													}));
+										})))),
+						A2(elm$core$Maybe$withDefault, 1, uibegin.F))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text(' >> Next')
+						A4(
+						author$project$ViewUtil$rangeSliderWithStep,
+						_Utils_Tuple3(firstyear, lastyear, 1),
+						false,
+						A2(
+							elm$core$Basics$composeR,
+							elm$core$String$toFloat,
+							A2(
+								elm$core$Basics$composeR,
+								elm$core$Maybe$withDefault(
+									function ($) {
+										return $.p;
+									}(timeline.k.q.a)),
+								A2(
+									elm$core$Basics$composeR,
+									elm$core$Basics$ceiling,
+									function (y) {
+										return author$project$Timeline$SlideEnd(
+											_Utils_update(
+												uiend,
+												{p: y}));
+									}))),
+						uiend.p),
+						A4(
+						author$project$ViewUtil$rangeSliderWithStep,
+						_Utils_Tuple3(1, 12, 1),
+						false,
+						A2(
+							elm$core$Basics$composeR,
+							elm$core$String$toFloat,
+							A2(
+								elm$core$Basics$composeR,
+								elm$core$Maybe$map(elm$core$Basics$floor),
+								A2(
+									elm$core$Basics$composeR,
+									elm$core$Maybe$withDefault(1),
+									A2(
+										elm$core$Basics$composeR,
+										A2(elm$core$Basics$clamp, 1, 12),
+										function (y) {
+											return author$project$Timeline$SlideEnd(
+												_Utils_update(
+													uiend,
+													{
+														F: elm$core$Maybe$Just(y)
+													}));
+										})))),
+						A2(elm$core$Maybe$withDefault, 1, uiend.F))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onClick(
+								author$project$Timeline$Select(timeline.k.t - 1))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('<< Previous')
+							])),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onClick(
+								author$project$Timeline$Select(timeline.k.t + 1))
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Next >>')
+							]))
 					]))
 			]));
 };
-var author$project$Timeline$CheckResize = {$: 4};
+var author$project$Timeline$timelineItemSizePx = 20;
+var author$project$TimelineRegion$floatExtents = function (r) {
+	var end = A2(
+		elm$core$Maybe$map,
+		author$project$TimelineRegion$dateToFloat(false),
+		author$project$TimelineRegion$getEnd(r));
+	var begin = A2(author$project$TimelineRegion$dateToFloat, true, r.a9);
+	return _Utils_Tuple2(
+		begin,
+		A2(elm$core$Maybe$withDefault, begin, end));
+};
 var elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 3, a: a};
 };
@@ -7775,7 +7927,7 @@ var author$project$ViewUtil$onClickNothingElse = function (tagger) {
 		elm$html$Html$Events$custom,
 		'click',
 		elm$json$Json$Decode$succeed(
-			{aY: tagger, a1: true, a8: true}));
+			{a$: tagger, a4: true, bb: true}));
 };
 var elm$html$Html$i = _VirtualDom_node('i');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
@@ -7783,26 +7935,26 @@ var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var author$project$Timeline$viewDiagram = F2(
 	function (times, _n0) {
-		var selected = _n0.s;
+		var selected = _n0.t;
 		var diagramWidth = _n0.T;
-		var extents = _n0.o;
+		var extents = _n0.q;
 		var yearlist = A2(
 			elm$core$List$map,
 			A2(
 				elm$core$Basics$composeR,
 				function ($) {
-					return $.a6;
+					return $.a9;
 				},
 				function ($) {
-					return $.bf;
+					return $.p;
 				}),
 			times);
-		var timelineHeight = 10 * (1 + elm$core$List$length(
+		var timelineHeight = 12 + (author$project$Timeline$timelineItemSizePx * elm$core$List$length(
 			A2(
 				elm$core$List$filter,
 				function (r) {
-					var _n4 = r.ag;
-					if (_n4.$ === 1) {
+					var _n5 = r.ah;
+					if (_n5.$ === 1) {
 						return false;
 					} else {
 						return true;
@@ -7810,9 +7962,14 @@ var author$project$Timeline$viewDiagram = F2(
 				},
 				times)));
 		var _n1 = extents;
-		var minyear = _n1.a;
-		var maxyear = _n1.b;
-		var widthscalar = diagramWidth / (maxyear - minyear);
+		var beginExt = _n1.a;
+		var endExt = _n1.b;
+		var _n2 = _Utils_Tuple2(
+			A2(author$project$TimelineRegion$dateToFloat, true, beginExt),
+			A2(author$project$TimelineRegion$dateToFloat, false, endExt));
+		var beginFlt = _n2.a;
+		var endFlt = _n2.b;
+		var widthscalar = diagramWidth / (endFlt - beginFlt);
 		return A2(
 			elm$html$Html$div,
 			_List_fromArray(
@@ -7839,12 +7996,13 @@ var author$project$Timeline$viewDiagram = F2(
 				elm$core$List$indexedMap,
 				F2(
 					function (i, r) {
-						var _n2 = author$project$TimelineRegion$floatExtents(r);
-						var begin = _n2.a;
-						var end = _n2.b;
-						var width = 10.0 + (widthscalar * (end - begin));
-						var _n3 = r.ag;
-						if (_n3.$ === 1) {
+						var _n3 = author$project$TimelineRegion$floatExtents(r);
+						var begin = _n3.a;
+						var end = _n3.b;
+						var left = widthscalar * (begin - beginFlt);
+						var width = author$project$Timeline$timelineItemSizePx + (widthscalar * (end - begin));
+						var _n4 = r.ah;
+						if (_n4.$ === 1) {
 							return A2(
 								elm$html$Html$div,
 								_List_fromArray(
@@ -7863,7 +8021,7 @@ var author$project$Timeline$viewDiagram = F2(
 										A2(
 										elm$html$Html$Attributes$style,
 										'left',
-										elm$core$String$fromFloat(widthscalar * (begin - minyear)) + 'px'),
+										elm$core$String$fromFloat(left) + 'px'),
 										A2(elm$html$Html$Attributes$style, 'top', '0'),
 										author$project$ViewUtil$onClickNothingElse(
 										author$project$Timeline$Select(i)),
@@ -7884,7 +8042,7 @@ var author$project$Timeline$viewDiagram = F2(
 											]),
 										_List_fromArray(
 											[
-												elm$html$Html$text(r.L)
+												elm$html$Html$text(r.M)
 											]))
 									]));
 						} else {
@@ -7895,7 +8053,10 @@ var author$project$Timeline$viewDiagram = F2(
 										A2(elm$html$Html$Attributes$style, 'box-sizing', 'border-box'),
 										A2(elm$html$Html$Attributes$style, 'position', 'relative'),
 										A2(elm$html$Html$Attributes$style, 'margin', '0'),
-										A2(elm$html$Html$Attributes$style, 'height', '10px'),
+										A2(
+										elm$html$Html$Attributes$style,
+										'height',
+										elm$core$String$fromInt(author$project$Timeline$timelineItemSizePx) + 'px'),
 										A2(
 										elm$html$Html$Attributes$style,
 										'width',
@@ -7903,14 +8064,14 @@ var author$project$Timeline$viewDiagram = F2(
 										A2(
 										elm$html$Html$Attributes$style,
 										'left',
-										elm$core$String$fromFloat(widthscalar * (begin - minyear)) + 'px'),
+										elm$core$String$fromFloat(left) + 'px'),
 										author$project$ViewUtil$onClickNothingElse(
 										author$project$Timeline$Select(i)),
 										A2(elm$html$Html$Attributes$style, 'background-color', 'tan'),
 										A2(
 										elm$html$Html$Attributes$style,
 										'border',
-										_Utils_eq(selected, i) ? '1px outset cyan' : '2px outset white'),
+										_Utils_eq(selected, i) ? '3px outset cyan' : '4px outset white'),
 										A2(elm$html$Html$Attributes$style, 'border-radius', '10px')
 									]),
 								_List_Nil);
@@ -7921,7 +8082,7 @@ var author$project$Timeline$viewDiagram = F2(
 var author$project$TimelineRegion$dayString = A2(
 	elm$core$Basics$composeR,
 	function ($) {
-		return $.K;
+		return $.ag;
 	},
 	elm$core$Maybe$map(
 		function (day) {
@@ -7946,7 +8107,7 @@ var author$project$TimelineRegion$dayString = A2(
 			}
 		}));
 var author$project$TimelineRegion$monthString = function (date) {
-	var _n0 = date.N;
+	var _n0 = date.F;
 	_n0$12:
 	while (true) {
 		if (!_n0.$) {
@@ -7984,27 +8145,58 @@ var author$project$TimelineRegion$monthString = function (date) {
 	}
 	return elm$core$Maybe$Nothing;
 };
+var author$project$TimelineRegion$timeString = A2(
+	elm$core$Basics$composeR,
+	function ($) {
+		return $.aN;
+	},
+	elm$core$Maybe$map(
+		function (time) {
+			switch (time) {
+				case 1200:
+					return '12:00pm';
+				case 0:
+					return '00:00am';
+				default:
+					var pm = time > 12;
+					var minute = A2(elm$core$Basics$modBy, 100, time);
+					var hour = (time / 100) | 0;
+					var pmAppliedHour = pm ? (hour - 12) : hour;
+					return elm$core$String$fromInt(pmAppliedHour) + (':' + (elm$core$String$fromInt(minute) + (pm ? 'pm' : 'am')));
+			}
+		}));
 var author$project$TimelineRegion$dateString = function (date) {
-	var _n0 = _Utils_Tuple2(
-		author$project$TimelineRegion$monthString(date),
-		author$project$TimelineRegion$dayString(date));
-	if (!_n0.a.$) {
-		if (!_n0.b.$) {
-			var monthName = _n0.a.a;
-			var dayName = _n0.b.a;
-			return monthName + (' ' + (dayName + (', ' + elm$core$String$fromInt(date.bf))));
+	return function (dateName) {
+		var _n3 = author$project$TimelineRegion$timeString(date);
+		if (!_n3.$) {
+			var timeName = _n3.a;
+			return timeName + (' on ' + dateName);
 		} else {
-			var monthName = _n0.a.a;
-			var _n1 = _n0.b;
-			return monthName + (' ' + elm$core$String$fromInt(date.bf));
+			return dateName;
 		}
-	} else {
-		var _n2 = _n0.a;
-		return elm$core$String$fromInt(date.bf);
-	}
+	}(
+		function () {
+			var _n0 = _Utils_Tuple2(
+				author$project$TimelineRegion$monthString(date),
+				author$project$TimelineRegion$dayString(date));
+			if (!_n0.a.$) {
+				if (!_n0.b.$) {
+					var monthName = _n0.a.a;
+					var dayName = _n0.b.a;
+					return monthName + (' ' + (dayName + (', ' + elm$core$String$fromInt(date.p))));
+				} else {
+					var monthName = _n0.a.a;
+					var _n1 = _n0.b;
+					return monthName + (' ' + elm$core$String$fromInt(date.p));
+				}
+			} else {
+				var _n2 = _n0.a;
+				return elm$core$String$fromInt(date.p);
+			}
+		}());
 };
-var author$project$TimelineRegion$toTimeString = function (r) {
-	var startDateString = author$project$TimelineRegion$dateString(r.a6);
+var author$project$TimelineRegion$toTimeRegionString = function (r) {
+	var startDateString = author$project$TimelineRegion$dateString(r.a9);
 	var maybeEndString = A2(
 		elm$core$Maybe$map,
 		author$project$TimelineRegion$dateString,
@@ -8092,11 +8284,11 @@ var elm$parser$Parser$Advanced$chompIf = F2(
 				elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{af: 1, c: s.c, d: s.d, b: s.b + 1, aE: s.aE + 1, a: s.a}) : A3(
+				{af: 1, c: s.c, d: s.d, b: s.b + 1, aG: s.aG + 1, a: s.a}) : A3(
 				elm$parser$Parser$Advanced$Good,
 				true,
 				0,
-				{af: s.af + 1, c: s.c, d: s.d, b: newOffset, aE: s.aE, a: s.a}));
+				{af: s.af + 1, c: s.c, d: s.d, b: newOffset, aG: s.aG, a: s.a}));
 		};
 	});
 var elm$parser$Parser$chompIf = function (isGood) {
@@ -8182,7 +8374,7 @@ var elm$parser$Parser$Advanced$chompUntil = function (_n0) {
 	var str = _n0.a;
 	var expecting = _n0.b;
 	return function (s) {
-		var _n1 = A5(elm$parser$Parser$Advanced$findSubString, str, s.b, s.aE, s.af, s.a);
+		var _n1 = A5(elm$parser$Parser$Advanced$findSubString, str, s.b, s.aG, s.af, s.a);
 		var newOffset = _n1.a;
 		var newRow = _n1.b;
 		var newCol = _n1.c;
@@ -8193,7 +8385,7 @@ var elm$parser$Parser$Advanced$chompUntil = function (_n0) {
 			elm$parser$Parser$Advanced$Good,
 			_Utils_cmp(s.b, newOffset) < 0,
 			0,
-			{af: newCol, c: s.c, d: s.d, b: newOffset, aE: newRow, a: s.a});
+			{af: newCol, c: s.c, d: s.d, b: newOffset, aG: newRow, a: s.a});
 	};
 };
 var elm$parser$Parser$chompUntil = function (str) {
@@ -10436,7 +10628,7 @@ var elm$parser$Parser$Advanced$consumeBase = _Parser_consumeBase;
 var elm$parser$Parser$Advanced$consumeBase16 = _Parser_consumeBase16;
 var elm$parser$Parser$Advanced$bumpOffset = F2(
 	function (newOffset, s) {
-		return {af: s.af + (newOffset - s.b), c: s.c, d: s.d, b: newOffset, aE: s.aE, a: s.a};
+		return {af: s.af + (newOffset - s.b), c: s.c, d: s.d, b: newOffset, aG: s.aG, a: s.a};
 	});
 var elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
 var elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
@@ -10488,7 +10680,7 @@ var elm$parser$Parser$Advanced$finalizeFloat = F6(
 			return A2(
 				elm$parser$Parser$Advanced$Bad,
 				true,
-				A4(elm$parser$Parser$Advanced$fromInfo, s.aE, s.af - (floatOffset + s.b), invalid, s.c));
+				A4(elm$parser$Parser$Advanced$fromInfo, s.aG, s.af - (floatOffset + s.b), invalid, s.c));
 		} else {
 			if (_Utils_eq(s.b, floatOffset)) {
 				return A2(
@@ -10534,37 +10726,37 @@ var elm$parser$Parser$Advanced$number = function (c) {
 			var baseOffset = zeroOffset + 1;
 			return A3(elm$parser$Parser$Advanced$isAsciiCode, 120, zeroOffset, s.a) ? A5(
 				elm$parser$Parser$Advanced$finalizeInt,
-				c.aX,
-				c.al,
+				c.a_,
+				c.an,
 				baseOffset,
 				A2(elm$parser$Parser$Advanced$consumeBase16, baseOffset, s.a),
 				s) : (A3(elm$parser$Parser$Advanced$isAsciiCode, 111, zeroOffset, s.a) ? A5(
 				elm$parser$Parser$Advanced$finalizeInt,
-				c.aX,
-				c.ar,
+				c.a_,
+				c.at,
 				baseOffset,
 				A3(elm$parser$Parser$Advanced$consumeBase, 8, baseOffset, s.a),
 				s) : (A3(elm$parser$Parser$Advanced$isAsciiCode, 98, zeroOffset, s.a) ? A5(
 				elm$parser$Parser$Advanced$finalizeInt,
-				c.aX,
+				c.a_,
 				c.ad,
 				baseOffset,
 				A3(elm$parser$Parser$Advanced$consumeBase, 2, baseOffset, s.a),
 				s) : A6(
 				elm$parser$Parser$Advanced$finalizeFloat,
-				c.aX,
-				c.ai,
-				c.ao,
-				c.aj,
+				c.a_,
+				c.ak,
+				c.aq,
+				c.al,
 				_Utils_Tuple2(zeroOffset, 0),
 				s)));
 		} else {
 			return A6(
 				elm$parser$Parser$Advanced$finalizeFloat,
-				c.aX,
-				c.ai,
-				c.ao,
-				c.aj,
+				c.a_,
+				c.ak,
+				c.aq,
+				c.al,
 				A3(elm$parser$Parser$Advanced$consumeBase, 10, s.b, s.a),
 				s);
 		}
@@ -10575,12 +10767,12 @@ var elm$parser$Parser$Advanced$int = F2(
 		return elm$parser$Parser$Advanced$number(
 			{
 				ad: elm$core$Result$Err(invalid),
-				ai: expecting,
-				aj: elm$core$Result$Err(invalid),
+				ak: expecting,
 				al: elm$core$Result$Err(invalid),
-				ao: elm$core$Result$Ok(elm$core$Basics$identity),
-				aX: invalid,
-				ar: elm$core$Result$Err(invalid)
+				an: elm$core$Result$Err(invalid),
+				aq: elm$core$Result$Ok(elm$core$Basics$identity),
+				a_: invalid,
+				at: elm$core$Result$Err(invalid)
 			});
 	});
 var elm$parser$Parser$int = A2(elm$parser$Parser$Advanced$int, elm$parser$Parser$ExpectingInt, elm$parser$Parser$ExpectingInt);
@@ -11117,23 +11309,23 @@ var author$project$Timeline$viewSelected = function (timeline) {
 			'SELECTION_ERROR',
 			elm$core$Maybe$Just('SELECTION_ERROR'),
 			elm$core$Maybe$Nothing),
-		(timeline.i.s >= 0) ? A2(
+		(timeline.k.t >= 0) ? A2(
 			elm$core$Maybe$map,
 			function (r) {
 				return _Utils_Tuple3(
-					r.L,
+					r.M,
 					r.U,
 					elm$core$Maybe$Just(
-						author$project$TimelineRegion$toTimeString(r)));
+						author$project$TimelineRegion$toTimeRegionString(r)));
 			},
 			elm$core$List$head(
-				A2(elm$core$List$drop, timeline.i.s, timeline.H))) : A2(
+				A2(elm$core$List$drop, timeline.k.t, timeline.J))) : A2(
 			elm$core$Maybe$map,
 			function (r) {
-				return _Utils_Tuple3(r.L, r.U, elm$core$Maybe$Nothing);
+				return _Utils_Tuple3(r.M, r.U, elm$core$Maybe$Nothing);
 			},
 			elm$core$List$head(
-				A2(elm$core$List$drop, (-timeline.i.s) - 1, timeline.V))));
+				A2(elm$core$List$drop, (-timeline.k.t) - 1, timeline.V))));
 	var headline = _n0.a;
 	var maybeText = _n0.b;
 	var maybeTimeString = _n0.c;
@@ -11190,7 +11382,7 @@ var author$project$Timeline$view = function (timeline) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				A2(author$project$Timeline$viewDiagram, timeline.H, timeline.i),
+				A2(author$project$Timeline$viewDiagram, timeline.J, timeline.k),
 				author$project$Timeline$viewControls(timeline),
 				author$project$Timeline$viewSelected(timeline)
 			]));
@@ -11251,7 +11443,7 @@ var author$project$Main$view = function (model) {
 };
 var elm$browser$Browser$document = _Browser_document;
 var author$project$Main$main = elm$browser$Browser$document(
-	{aW: author$project$Main$init, a9: author$project$Main$subscriptions, ba: author$project$Main$update, bc: author$project$Main$view});
+	{aZ: author$project$Main$init, bc: author$project$Main$subscriptions, bd: author$project$Main$update, be: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
 	elm$json$Json$Decode$succeed(0))(0)}});}(this));
 

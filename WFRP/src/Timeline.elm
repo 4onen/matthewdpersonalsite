@@ -4,9 +4,10 @@ import Browser.Dom
 import Browser.Events
 import Dict exposing (Dict)
 import Html exposing (Html)
-import Html.Parser
 import Html.Attributes as A
 import Html.Events as E
+import Html.Parser
+import Html.Parser.Util
 import Json.Decode as JD
 import Task
 import TimelineRegion exposing (RegionType(..), TimelineRegion)
@@ -304,22 +305,41 @@ viewControls timeline =
 
 viewSelected : Timeline -> Html Msg
 viewSelected timeline =
-    (if timeline.ui.selected >= 0 then
-        timeline.times
-            |> List.drop timeline.ui.selected
-            |> List.head
-            |> Maybe.map TimelineRegion.view
+    let
+        ( headline, maybeText, maybeTimeString ) =
+            (if timeline.ui.selected >= 0 then
+                timeline.times
+                    |> List.drop timeline.ui.selected
+                    |> List.head
+                    |> Maybe.map
+                        (\r ->
+                            ( r.headline, r.text, Just <| TimelineRegion.toTimeString r )
+                        )
 
-     else
-        timeline.titles
-            |> List.drop (-timeline.ui.selected - 1)
-            |> List.head
-            |> Maybe.map
-                (\r ->
-                    Html.div []
-                        [ Html.h2 [] [ Html.text r.headline ]
-                        , Html.p [] [ Html.text (r.text |> Maybe.withDefault "No title card description text!") ]
-                        ]
-                )
-    )
-        |> Maybe.withDefault (Html.div [] [ Html.text "Nothing selected!" ])
+             else
+                timeline.titles
+                    |> List.drop (-timeline.ui.selected - 1)
+                    |> List.head
+                    |> Maybe.map (\r -> ( r.headline, r.text, Nothing ))
+            )
+                |> Maybe.withDefault ( "SELECTION_ERROR", Just "SELECTION_ERROR", Nothing )
+
+        headlineHtml =
+            Html.Parser.run headline |> Result.map Html.Parser.Util.toVirtualDom |> Result.withDefault [ Html.text headline ]
+
+        textHtml =
+            case maybeText of
+                Just str ->
+                    str
+                        |> Html.Parser.run
+                        |> Result.map Html.Parser.Util.toVirtualDom
+                        |> Result.withDefault [ Html.text str ]
+
+                Nothing ->
+                    [ Html.text "" ]
+    in
+    Html.div []
+        [ Html.h2 [] headlineHtml
+        , Html.h3 [] [ Html.text (maybeTimeString |> Maybe.withDefault "") ]
+        , Html.p [] textHtml
+        ]

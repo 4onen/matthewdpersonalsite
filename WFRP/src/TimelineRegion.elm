@@ -4,9 +4,9 @@ module TimelineRegion exposing
     , TimelineRegion
     , compare
     , compareDates
-    , listFromSheet
     , floatExtents
-    , view
+    , listFromSheet
+    , toTimeString
     )
 
 import Dict exposing (Dict)
@@ -211,8 +211,8 @@ dateToFloat d =
         / (31.0 * 12.0)
 
 
-view : TimelineRegion -> Html.Html msg
-view r =
+toTimeString : TimelineRegion -> String
+toTimeString r =
     let
         startDateString =
             dateString r.start
@@ -220,20 +220,13 @@ view r =
         maybeEndString =
             getEnd r
                 |> Maybe.map dateString
-
-        timespanString =
-            case maybeEndString of
-                Just endDateString ->
-                    startDateString ++ " - " ++ endDateString
-
-                Nothing ->
-                    startDateString
     in
-    Html.div []
-        [ Html.h2 [] [ Html.text r.headline ]
-        , Html.h3 [] [ Html.text timespanString ]
-        , Html.p [] [ Html.text (r.text |> Maybe.withDefault "") ]
-        ]
+    case maybeEndString of
+        Just endDateString ->
+            startDateString ++ " - " ++ endDateString
+
+        Nothing ->
+            startDateString
 
 
 dateString : Date -> String

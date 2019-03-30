@@ -2,6 +2,8 @@ module Timeline exposing (Msg, Timeline, fromSheet, update, view)
 
 import Browser.Dom
 import Browser.Events
+import Calendar
+import DateTime
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -9,15 +11,17 @@ import Html.Events as E
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as JD
+import MyDateTime exposing (DateTime)
 import Task
-import TimelineRegion exposing (Date, RegionType(..), TimelineRegion)
+import Time exposing (Posix)
+import TimelineRegion exposing (RegionType(..), TimelineRegion)
 import ViewUtil exposing (onClickNothingElse, rangeSliderWithStep, text)
 
 
 type alias UIModel =
     { selected : Int
     , diagramWidth : Float
-    , extents : ( Date, Date )
+    , extents : ( Calendar.Date, Calendar.Date )
     }
 
 
@@ -36,10 +40,11 @@ type alias Timeline =
 
 type Msg
     = Select Int
-    | SlideStart Date
-    | SlideEnd Date
+    | MoveStart Calendar.Date
+    | MoveEnd Calendar.Date
     | Resize Float
     | CheckResize
+    | NoOp
 
 
 timelineID =
@@ -48,6 +53,14 @@ timelineID =
 
 timelineItemSizePx =
     20
+
+
+defaultDate =
+    Calendar.fromPosix (Time.millisToPosix 0)
+
+
+defaultDateTime =
+    DateTime.fromPosix (Time.millisToPosix 0)
 
 
 fromSheet : List (Dict String String) -> Result (List String) ( Timeline, Cmd Msg )
@@ -103,23 +116,20 @@ fromSheet sheet =
 
 uiInit : List TimelineRegion -> UIModel
 uiInit ls =
-    let
-        ( begin, end ) =
-            case dateExtents ls of
-                Just dates ->
-                    dates
-
-                Nothing ->
-                    let
-                        defaultDate =
-                            { year = 0, month = Just 1, day = Just 1, time = Nothing }
-                    in
-                    Tuple.pair defaultDate defaultDate
-    in
     { selected = -1
     , diagramWidth = 1024
     , extents =
-        ( begin, { end | year = end.year + 1 } )
+        case dateExtents ls of
+            Just dates ->
+                dates
+                    |> Tuple.mapBoth
+                        MyDateTime.getDate
+                        MyDateTime.getDate
+
+            Nothing ->
+                ( defaultDate
+                , defaultDate
+                )
     }
 
 
@@ -130,7 +140,7 @@ getDiagramWidth =
         |> Task.attempt (Result.map (.element >> .width) >> Result.withDefault 1024 >> Resize)
 
 
-dateExtents : List TimelineRegion -> Maybe ( Date, Date )
+dateExtents : List TimelineRegion -> Maybe ( DateTime, DateTime )
 dateExtents =
     List.foldl
         (\r maybeExtents ->
@@ -144,37 +154,19 @@ dateExtents =
                             TimelineRegion.dateExtents r
                     in
                     Just
-                        ( case TimelineRegion.compareDates nbegin begin of
+                        ( case MyDateTime.compare nbegin begin of
                             LT ->
                                 nbegin
 
                             _ ->
                                 begin
-                        , case TimelineRegion.compareDates nend end of
+                        , case MyDateTime.compare nend end of
                             GT ->
                                 nend
 
                             _ ->
                                 end
                         )
-        )
-        Nothing
-
-
-floatExtents : List TimelineRegion -> Maybe ( Float, Float )
-floatExtents =
-    List.foldl
-        (\r maybeExtents ->
-            case maybeExtents of
-                Nothing ->
-                    Just <| TimelineRegion.floatExtents r
-
-                Just ( least, greatest ) ->
-                    let
-                        ( rbegin, rend ) =
-                            TimelineRegion.floatExtents r
-                    in
-                    Just ( min rbegin least, max rend greatest )
         )
         Nothing
 
@@ -202,14 +194,14 @@ updateHelper msg timeline ui =
             , Cmd.none
             )
 
-        SlideStart newStart ->
+        MoveStart newStart ->
             let
                 ( begin, end ) =
                     ui.extents
             in
             ( { ui
                 | extents =
-                    ( if TimelineRegion.compareDates newStart end == LT then
+                    ( if Calendar.compare newStart end == LT then
                         newStart
 
                       else
@@ -220,7 +212,7 @@ updateHelper msg timeline ui =
             , Cmd.none
             )
 
-        SlideEnd newEnd ->
+        MoveEnd newEnd ->
             let
                 ( begin, end ) =
                     ui.extents
@@ -228,7 +220,7 @@ updateHelper msg timeline ui =
             ( { ui
                 | extents =
                     ( begin
-                    , if TimelineRegion.compareDates newEnd begin == GT then
+                    , if Calendar.compare newEnd begin == GT then
                         newEnd
 
                       else
@@ -244,6 +236,9 @@ updateHelper msg timeline ui =
         CheckResize ->
             ( ui, getDiagramWidth )
 
+        NoOp ->
+            ( ui, Cmd.none )
+
 
 view : Timeline -> Html Msg
 view timeline =
@@ -257,17 +252,16 @@ view timeline =
 viewDiagram : List TimelineRegion -> UIModel -> Html.Html Msg
 viewDiagram times { selected, diagramWidth, extents } =
     let
-        yearlist =
-            times |> List.map (.start >> .year)
-
         ( beginExt, endExt ) =
             extents
 
-        ( beginFlt, endFlt ) =
-            ( TimelineRegion.dateToFloat True beginExt, TimelineRegion.dateToFloat False endExt )
+        ( beginMil, endMil ) =
+            ( Calendar.toMillis beginExt
+            , Calendar.toMillis endExt
+            )
 
         widthscalar =
-            diagramWidth / (endFlt - beginFlt)
+            (diagramWidth - timelineItemSizePx) / (toFloat endMil - toFloat beginMil)
 
         timelineHeight =
             times
@@ -289,13 +283,16 @@ viewDiagram times { selected, diagramWidth, extents } =
             (\i r ->
                 let
                     ( begin, end ) =
-                        TimelineRegion.floatExtents r
+                        TimelineRegion.dateExtents r
+                            |> Tuple.mapBoth
+                                MyDateTime.toMillis
+                                MyDateTime.toMillis
 
                     width =
-                        timelineItemSizePx + widthscalar * (end - begin)
+                        timelineItemSizePx + widthscalar * toFloat (end - begin)
 
                     left =
-                        widthscalar * (begin - beginFlt)
+                        widthscalar * toFloat (begin - beginMil)
                 in
                 case r.end of
                     Era _ ->
@@ -355,21 +352,17 @@ viewDiagram times { selected, diagramWidth, extents } =
 viewControls : Timeline -> Html Msg
 viewControls timeline =
     let
-        defaultDate =
-            { year = 0, month = Nothing, day = Nothing, time = Nothing }
-
         ( begin, end ) =
             dateExtents timeline.times
+                |> Maybe.map (Tuple.mapBoth MyDateTime.getDate MyDateTime.getDate)
                 |> Maybe.withDefault ( defaultDate, defaultDate )
 
         ( firstyear, lastyear ) =
             ( begin
-                |> TimelineRegion.dateToFloat True
-                |> Basics.floor
+                |> Calendar.toMillis
                 |> Basics.toFloat
             , end
-                |> TimelineRegion.dateToFloat False
-                |> Basics.ceiling
+                |> Calendar.toMillis
                 |> Basics.toFloat
             )
 
@@ -378,56 +371,6 @@ viewControls timeline =
     in
     Html.div []
         [ Html.button [ E.onClick CheckResize ] [ Html.text "Resize Timeline" ]
-
-        -- Start Date selector
-        , Html.div []
-            [ rangeSliderWithStep
-                ( firstyear, lastyear, 1 )
-                False
-                (String.toFloat
-                    >> Maybe.withDefault (toFloat <| .year (Tuple.first timeline.ui.extents))
-                    >> Basics.floor
-                    >> (\y -> SlideStart { uibegin | year = y })
-                )
-                (toFloat uibegin.year)
-
-            -- Start month
-            , rangeSliderWithStep
-                ( 1, 12, 1 )
-                False
-                (String.toFloat
-                    >> Maybe.map Basics.floor
-                    >> Maybe.withDefault 1
-                    >> Basics.clamp 1 12
-                    >> (\y -> SlideStart { uibegin | month = Just y })
-                )
-                (uibegin.month |> Maybe.withDefault 1 |> toFloat)
-            ]
-
-        -- End Date selector
-        , Html.div []
-            [ rangeSliderWithStep
-                ( firstyear, lastyear, 1 )
-                False
-                (String.toFloat
-                    >> Maybe.withDefault (toFloat <| .year (Tuple.first timeline.ui.extents))
-                    >> Basics.ceiling
-                    >> (\y -> SlideEnd { uiend | year = y })
-                )
-                (uiend.year |> toFloat)
-
-            -- End Month
-            , rangeSliderWithStep
-                ( 1, 12, 1 )
-                False
-                (String.toFloat
-                    >> Maybe.map Basics.floor
-                    >> Maybe.withDefault 1
-                    >> Basics.clamp 1 12
-                    >> (\y -> SlideEnd { uiend | month = Just y })
-                )
-                (uiend.month |> Maybe.withDefault 1 |> toFloat)
-            ]
         , Html.div []
             [ Html.button [ E.onClick (Select <| timeline.ui.selected - 1) ] [ Html.text "<< Previous" ]
             , Html.button [ E.onClick (Select <| timeline.ui.selected + 1) ] [ Html.text "Next >>" ]
@@ -445,7 +388,7 @@ viewSelected timeline =
                     |> List.head
                     |> Maybe.map
                         (\r ->
-                            ( r.headline, r.text, Just <| TimelineRegion.toTimeRegionString r )
+                            ( r.headline, r.text, Just <| TimelineRegion.toTimeRangeString r )
                         )
 
              else

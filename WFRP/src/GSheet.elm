@@ -101,12 +101,13 @@ errorSimplifier result =
 
 decoder : JD.Decoder (List (Result (List Parser.DeadEnd) (Dict String String)))
 decoder =
-    JD.at [ "feed", "entry" ] <|
-        JD.list <|
-            JD.map2
-                (\a b -> Result.map ((::) ( "year", a ) >> Dict.fromList) b)
-                (JD.at [ "title", "$t" ] JD.string)
-                (JD.map (Parser.run rowParser) <| JD.at [ "content", "$t" ] JD.string)
+    JD.map List.reverse <|
+        JD.at [ "feed", "entry" ] <|
+            JD.list <|
+                JD.map2
+                    (\a b -> Result.map ((::) ( "year", a ) >> Dict.fromList) b)
+                    (JD.at [ "title", "$t" ] JD.string)
+                    (JD.map (Parser.run rowParser) <| JD.at [ "content", "$t" ] JD.string)
 
 
 rowParser : Parser.Parser (List ( String, String ))

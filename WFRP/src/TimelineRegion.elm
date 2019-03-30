@@ -1,53 +1,47 @@
 module TimelineRegion exposing
-    ( Date
-    , RegionType(..)
+    ( RegionType(..)
     , TimelineRegion
-    , compare
-    , compareDates
     , dateExtents
-    , dateToFloat
-    , floatExtents
     , listFromSheet
-    , toTimeRegionString
+    , toTimeRangeString
     )
 
+import Calendar
+import Clock
+import DateTime
 import Dict exposing (Dict)
 import Html
+import MyDateTime exposing (DateTime)
+import Time
 
 
 type alias Described a =
     { a | headline : String, text : Maybe String }
 
 
-type alias Date =
-    { year : Int
-    , month : Maybe Int
-    , day : Maybe Int
-    , time : Maybe Int
-    }
-
-
 type RegionType
-    = Region Date
-    | Era Date
+    = Region DateTime
+    | Era DateTime
     | Point
 
 
 type alias TimelineRegion =
-    Described { start : Date, end : RegionType }
+    Described { start : DateTime, end : RegionType }
 
 
 listFromSheet : List (Dict String String) -> Result (List String) (List TimelineRegion)
 listFromSheet =
-    List.filter (\r -> Dict.get "type" r /= Just "title")
+    List.indexedMap Tuple.pair
+        >> List.map (Tuple.mapFirst ((+) 2))
+        >> List.filter (\( _, r ) -> Dict.get "type" r /= Just "title")
         >> List.foldl
-            (\i o ->
-                case ( fromRow i, o ) of
+            (\( i, r ) o ->
+                case ( fromRow r, o ) of
                     ( Err err, Err errlist ) ->
-                        Err <| ("Row #: " ++ err) :: errlist
+                        Err <| ("Row " ++ String.fromInt i ++ ": " ++ err) :: errlist
 
                     ( Err err, _ ) ->
-                        Err [ "Row #: " ++ err ]
+                        Err [ "Row " ++ String.fromInt i ++ ": " ++ err ]
 
                     ( Ok _, Err errlist ) ->
                         Err errlist
@@ -56,42 +50,85 @@ listFromSheet =
                         Ok <| dat :: datlist
             )
             (Result.Ok [])
-        >> Result.map sort
+        >> Result.map (List.sortWith compare)
 
 
-sort : List TimelineRegion -> List TimelineRegion
-sort =
-    List.sortWith compare
+compare : TimelineRegion -> TimelineRegion -> Basics.Order
+compare a b =
+    let
+        startcomp =
+            MyDateTime.compare a.start b.start
+    in
+    if startcomp /= EQ then
+        startcomp
+
+    else
+        case ( a.end, b.end ) of
+            ( Region da, Region db ) ->
+                MyDateTime.compare da db
+
+            ( Era da, Era db ) ->
+                MyDateTime.compare da db
+
+            ( Era _, _ ) ->
+                LT
+
+            ( _, Era _ ) ->
+                GT
+
+            ( Point, Point ) ->
+                EQ
+
+            ( Point, _ ) ->
+                LT
+
+            ( _, Point ) ->
+                GT
 
 
 fromRow : Dict String String -> Result String TimelineRegion
 fromRow r =
     let
-        getRowStartDate : Dict String String -> Result String Date
-        getRowStartDate =
-            getRowDateObj "year" "month" "day" "time"
+        getRowStartDateTime : Dict String String -> Result String DateTime
+        getRowStartDateTime =
+            getRowDateTime "year" "month" "day" "time"
 
-        getRowEndDate : Dict String String -> Result String Date
-        getRowEndDate =
-            getRowDateObj "endyear" "endmonth" "endday" "endtime"
+        getRowEndDateTime : Dict String String -> Result String DateTime
+        getRowEndDateTime =
+            getRowDateTime "endyear" "endmonth" "endday" "endtime"
 
-        getRowDateObj : String -> String -> String -> String -> Dict String String -> Result String Date
-        getRowDateObj yearkey monthkey daykey timekey row =
-            Dict.get yearkey row
-                |> Result.fromMaybe "DateObj missing year"
-                |> Result.andThen (String.toInt >> Result.fromMaybe "DateObj year not an integer!")
-                |> Result.map
+        getRowDateTime : String -> String -> String -> String -> Dict String String -> Result String DateTime
+        getRowDateTime yearkey monthkey daykey timekey row =
+            let
+                maybeTime =
+                    getRowTime timekey row
+            in
+            row
+                |> Dict.get yearkey
+                |> Result.fromMaybe "Can't find year"
+                |> Result.andThen (String.toInt >> Result.fromMaybe "Can't parse year -- not an integer")
+                |> Result.andThen
                     (\year ->
-                        Date
-                            year
-                            (Dict.get monthkey r |> Maybe.andThen String.toInt)
-                            (Dict.get daykey r |> Maybe.andThen String.toInt)
-                            (Dict.get timekey r |> Maybe.andThen String.toInt)
+                        MyDateTime.from year
+                            (Dict.get monthkey row |> Maybe.andThen String.toInt |> Maybe.andThen monthFromInt)
+                            (Dict.get daykey row |> Maybe.andThen String.toInt)
+                            maybeTime
+                            |> Result.fromMaybe ("Error forming date object for year " ++ String.fromInt year)
                     )
 
-        splitMilitary : Int -> ( Int, Int )
-        splitMilitary i =
-            ( i // 100, modBy 100 i )
+        getRowTime : String -> Dict String String -> Maybe Clock.Time
+        getRowTime timekey =
+            Dict.get timekey
+                >> Maybe.andThen String.toInt
+                >> Maybe.map
+                    (\t ->
+                        { hours = t // 100
+                        , minutes = modBy 100 t
+                        , seconds = 0
+                        , milliseconds = 0
+                        }
+                    )
+                >> Maybe.andThen Clock.fromRawParts
     in
     Result.map2
         (\headline date ->
@@ -99,7 +136,7 @@ fromRow r =
             , text = Dict.get "text" r
             , start = date
             , end =
-                case getRowEndDate r of
+                case getRowEndDateTime r of
                     Ok enddate ->
                         case Dict.get "type" r of
                             Just "era" ->
@@ -113,7 +150,7 @@ fromRow r =
             }
         )
         (Dict.get "headline" r |> Result.fromMaybe "Row missing headline!")
-        (getRowStartDate r)
+        (getRowStartDateTime r)
 
 
 compareMaybes : Maybe comparable -> Maybe comparable -> Basics.Order
@@ -137,61 +174,7 @@ compareMaybesWith f a b =
             Basics.EQ
 
 
-compareDates : Date -> Date -> Basics.Order
-compareDates a b =
-    let
-        compyear =
-            Basics.compare a.year b.year
-    in
-    if compyear /= EQ then
-        compyear
-
-    else
-        let
-            compmonth =
-                compareMaybes a.month b.month
-        in
-        if compmonth /= EQ then
-            compmonth
-
-        else
-            compareMaybes a.day b.day
-
-
-compare : TimelineRegion -> TimelineRegion -> Basics.Order
-compare a b =
-    let
-        compstart =
-            compareDates a.start b.start
-    in
-    if compstart /= EQ then
-        compstart
-
-    else
-        case ( a.end, b.end ) of
-            ( Point, Point ) ->
-                EQ
-
-            ( Point, _ ) ->
-                GT
-
-            ( _, Point ) ->
-                LT
-
-            ( Region ea, Region eb ) ->
-                compareDates ea eb
-
-            ( Era ea, Era eb ) ->
-                compareDates ea eb
-
-            ( Era _, _ ) ->
-                LT
-
-            ( _, Era _ ) ->
-                GT
-
-
-getEnd : TimelineRegion -> Maybe Date
+getEnd : TimelineRegion -> Maybe DateTime
 getEnd r =
     case r.end of
         Region date ->
@@ -204,56 +187,20 @@ getEnd r =
             Nothing
 
 
-dateExtents : TimelineRegion -> ( Date, Date )
+dateExtents : TimelineRegion -> ( DateTime, DateTime )
 dateExtents r =
     ( r.start, getEnd r |> Maybe.withDefault r.start )
 
 
-floatExtents : TimelineRegion -> ( Float, Float )
-floatExtents r =
-    let
-        begin =
-            dateToFloat True r.start
-
-        end =
-            getEnd r |> Maybe.map (dateToFloat False)
-    in
-    ( begin, Maybe.withDefault begin end )
-
-
-dateToFloat : Bool -> Date -> Float
-dateToFloat roundBegin d =
-    let
-        defaultDay =
-            if roundBegin then
-                1
-
-            else
-                31
-
-        defaultMonth =
-            if roundBegin then
-                1
-
-            else
-                12
-    in
-    toFloat d.year
-        + toFloat ((d.month |> Maybe.withDefault defaultMonth) - 1)
-        / 12.0
-        + toFloat ((d.day |> Maybe.withDefault defaultDay) - 1)
-        / (31.0 * 12.0)
-
-
-toTimeRegionString : TimelineRegion -> String
-toTimeRegionString r =
+toTimeRangeString : TimelineRegion -> String
+toTimeRangeString r =
     let
         startDateString =
-            dateString r.start
+            dateTimeString r.start
 
         maybeEndString =
             getEnd r
-                |> Maybe.map dateString
+                |> Maybe.map dateTimeString
     in
     case maybeEndString of
         Just endDateString ->
@@ -263,140 +210,168 @@ toTimeRegionString r =
             startDateString
 
 
-dateString : Date -> String
-dateString date =
-    (case ( monthString date, dayString date ) of
+dateTimeString : DateTime -> String
+dateTimeString date =
+    (case
+        ( Maybe.map monthToString <| MyDateTime.getMonth date
+        , Maybe.map dayToString <| MyDateTime.getDay date
+        )
+     of
         ( Just monthName, Just dayName ) ->
-            monthName ++ " " ++ dayName ++ ", " ++ String.fromInt date.year
+            monthName ++ " " ++ dayName ++ ", " ++ String.fromInt (MyDateTime.getYear date)
 
         ( Just monthName, Nothing ) ->
-            monthName ++ " " ++ String.fromInt date.year
+            monthName ++ " " ++ String.fromInt (MyDateTime.getYear date)
 
         ( Nothing, _ ) ->
-            String.fromInt date.year
+            String.fromInt (MyDateTime.getYear date)
     )
         |> (\dateName ->
-            case timeString date of
-                Just timeName ->
-                    timeName ++ " on "++dateName
+                case Maybe.map timeToString <| MyDateTime.getTime date of
+                    Just timeName ->
+                        timeName ++ " on " ++ dateName
 
-                Nothing ->
-                    dateName
+                    Nothing ->
+                        dateName
            )
 
 
-monthString : Date -> Maybe String
-monthString date =
-    case date.month of
-        Just 1 ->
-            Just "January"
+monthFromInt : Int -> Maybe Time.Month
+monthFromInt m =
+    case m of
+        1 ->
+            Just Time.Jan
 
-        Just 2 ->
-            Just "February"
+        2 ->
+            Just Time.Feb
 
-        Just 3 ->
-            Just "March"
+        3 ->
+            Just Time.Mar
 
-        Just 4 ->
-            Just "April"
+        4 ->
+            Just Time.Apr
 
-        Just 5 ->
-            Just "May"
+        5 ->
+            Just Time.May
 
-        Just 6 ->
-            Just "June"
+        6 ->
+            Just Time.Jun
 
-        Just 7 ->
-            Just "July"
+        7 ->
+            Just Time.Jul
 
-        Just 8 ->
-            Just "August"
+        8 ->
+            Just Time.Aug
 
-        Just 9 ->
-            Just "September"
+        9 ->
+            Just Time.Sep
 
-        Just 10 ->
-            Just "October"
+        10 ->
+            Just Time.Oct
 
-        Just 11 ->
-            Just "November"
+        11 ->
+            Just Time.Nov
 
-        Just 12 ->
-            Just "December"
+        12 ->
+            Just Time.Dec
 
         _ ->
             Nothing
 
 
-dayString : Date -> Maybe String
-dayString =
-    .day
-        >> Maybe.map
-            (\day ->
-                case day of
-                    1 ->
-                        "1st"
+monthToString : Time.Month -> String
+monthToString month =
+    case month of
+        Time.Jan ->
+            "January"
 
-                    2 ->
-                        "2nd"
+        Time.Feb ->
+            "February"
 
-                    3 ->
-                        "3rd"
+        Time.Mar ->
+            "March"
 
-                    21 ->
-                        "21st"
+        Time.Apr ->
+            "April"
 
-                    22 ->
-                        "22nd"
+        Time.May ->
+            "May"
 
-                    23 ->
-                        "23rd"
+        Time.Jun ->
+            "June"
 
-                    31 ->
-                        "31st"
+        Time.Jul ->
+            "July"
 
-                    n ->
-                        String.fromInt n ++ "th"
-            )
+        Time.Aug ->
+            "August"
+
+        Time.Sep ->
+            "September"
+
+        Time.Oct ->
+            "October"
+
+        Time.Nov ->
+            "November"
+
+        Time.Dec ->
+            "December"
 
 
-timeString : Date -> Maybe String
-timeString =
-    .time
-        >> Maybe.map
-            (\time ->
-                case time of
-                    1200 ->
-                        "12:00pm"
+dayToString : Int -> String
+dayToString day =
+    case day of
+        1 ->
+            "1st"
 
-                    0 ->
-                        "00:00am"
+        2 ->
+            "2nd"
 
-                    _ ->
-                        let
-                            hour =
-                                time // 100
+        3 ->
+            "3rd"
 
-                            minute =
-                                modBy 100 time
+        21 ->
+            "21st"
 
-                            pm =
-                                time > 12
+        22 ->
+            "22nd"
 
-                            pmAppliedHour =
-                                if pm then
-                                    hour - 12
+        23 ->
+            "23rd"
 
-                                else
-                                    hour
-                        in
-                        String.fromInt pmAppliedHour
-                            ++ ":"
-                            ++ String.fromInt minute
-                            ++ (if pm then
-                                    "pm"
+        31 ->
+            "31st"
 
-                                else
-                                    "am"
-                               )
-            )
+        n ->
+            String.fromInt n ++ "th"
+
+
+timeToString : Clock.Time -> String
+timeToString time =
+    let
+        hour =
+            Clock.getHours time
+
+        minute =
+            Clock.getMinutes time
+
+        pm =
+            hour > 12
+
+        pmAppliedHour =
+            if pm then
+                hour - 12
+
+            else
+                hour
+    in
+    String.fromInt pmAppliedHour
+        ++ ":"
+        ++ String.fromInt minute
+        ++ (if pm then
+                "pm"
+
+            else
+                "am"
+           )

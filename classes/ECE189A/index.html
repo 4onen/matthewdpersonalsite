@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VisHawk | ECE189A F19</title>
     <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="additional.css">
 </head>
 
 <body>
@@ -15,33 +16,45 @@
     <article id="pageContent">
         <hr>
         <h1 class="medheader">Project</h1>
-        <p>The VisHawk project is pursuing completely autonomous flight of multirotor UAVs between ships underway at
-            sea. We
-            implement this behaviour by guiding final approach with Apriltag visual fiducials.</p>
+        <p>The VisHawk project is pursuing RF-silent autonomous flight of multirotor UAVs between ships
+            underway at sea. We implement this behaviour by guiding the final approach with Apriltag visual
+            fiducials. Using GPS and a known initial trajectory of the landing vessel, VisHawk closes to
+            within visual range of the vessel. VisHawk then uses the visual marker to produce a safe
+            approach trajectory, updating in real time to consider uncertainties such as sea conditions
+            moving the deck of the landing vessel.</p>
+        <p>tl;dr? Pursuing RF-silent autonomous flight of multirotor UAVs between ships underway at sea by using
+            computer vision to guide final approach where GPS would be too inaccurate.</p>
         <hr>
         <h1 class="medheader">Team</h1>
         <div>
-            <h1 class="smallheader">Team Lead - Matthew Dupree</h1>
-            <img alt="TODO: Headshot">
+            <img class="headshot" src="team/Matthew.jpg" alt="Matthew headshot">
+            <h1 class="smallheader">Team lead - Matthew Dupree
+                <a class="linkedin_ico" href="https://www.linkedin.com/in/4onen/"></a>
+            </h1>
             <p>A person who's okay.</p>
         </div>
         <div>
-            <h1 class="smallheader">Team _____ - Xihan Liu</h1>
-            <img alt="TODO: Headshot">
+            <img class="headshot" src="team/Xihan.jpg" alt="Xihan headshot">
+            <h1 class="smallheader">Team member - Xihan Liu
+                <a class="linkedin_ico" href="https://linkedin.com/in/xihan-liu-a77274171"></a>
+            </h1>
             <p>A great person who's great at drones.</p>
         </div>
         <div>
-            <h1 class="smallheader">Team ______ - Yingchao Zhu</h1>
-            <img alt="TODO: Headshot">
+            <img class="headshot" src="team/Yingchao.jpg" alt="Yingchao headshot">
+            <h1 class="smallheader">Team member - Yingchao Zhu
+                <a class="linkedin_ico" href="https://www.linkedin.com/in/yingchao-zhu-42a2b3133"></a>
+            </h1>
             <p>A great person who's great at drones.</p>
         </div>
-        <hr>
+        <hr style="margin-top:100px;">
         <h1 class="medheader">Progress</h1>
         <p>System block diagram! Hardware! Progress!</p>
+        <p>This section is still under construction.</p>
     </article>
     <footer>
-        <p>Copyright 2019, UCSB F19 ECE189A VisHawk student team</p>
-        <p>Page last updated: October 28, 2019</p>
+        <p class="smoltxt">Copyright 2019 UCSB ECE189 VisHawk team</p>
+        <p>Page last updated: November 8, 2019</p>
     </footer>
 </body>
 

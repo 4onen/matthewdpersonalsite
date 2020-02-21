@@ -11,8 +11,16 @@
 
 /* Set a background color */
 body {
-  background-color: white;
+  background-image: src = "bg.jpg";
+  
   font-family: Helvetica, sans-serif;
+}
+
+.Detail_box{
+  padding: 10px 10px;
+  background-color: white;
+  position: relative;
+  
 }
 
 /* The actual timeline (the vertical ruler) */
@@ -139,3 +147,4 @@ body {
     left: 0%;
   }
 }
+

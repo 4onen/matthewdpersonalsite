@@ -99,3 +99,31 @@ footer{
     text-align: center;
     background-color: gainsboro;
 }
+
+.link_ico{
+    color:inherit;
+}
+
+.link_ico::after{
+    display:inline-block;
+    font-size:0.5em;
+    vertical-align:middle;
+    content:"</>";
+    color:gray;
+}
+
+.linkedin_ico{
+    display:inline-block;
+}
+
+.linkedin_ico::before{
+    display:inline-block;
+    width:1.2em;
+    height:1.1em;
+    content:"in";
+    text-align:center;
+    font-family:sans-serif;
+    color:white;
+    background:#0077B5;
+    border-radius:0.2em;
+}

@@ -1,3 +1,133 @@
+html{
+  height:100%;
+  box-sizing: border-box
+}
+
+*,
+*:before,
+*:after{
+  box-sizing: inherit;
+}
+
+body{
+  position: relative;
+  margin: 0;
+  padding-bottom: 6rem;
+  min-height: 100%;
+  font-size: 1.1em;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#navcontainer{
+  width: 100%;
+  text-align: center;
+}
+
+nav{
+  max-width: 640px;
+  width: 94%;
+  margin: 0 auto;
+  text-align: right;
+  font-size: 1.3rem;
+}
+
+#pageContent{
+  max-width: 640px;
+  width: 94%;
+  padding: 1em 0;
+  margin: 0 auto;
+}
+
+.center{
+  text-align: center;
+}
+
+.nomarg{
+  margin: 0;
+}
+
+h1{
+  font-size: 1.5em;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.bigheader{
+  font-size: 2.0em;
+}
+
+.medheader{
+  font-size: 1.3em;
+}
+
+.smallheader{
+  font-size: 1.1em;
+}
+
+section{
+  margin-top: 64px;
+  text-align: justify;
+}
+
+.fleximcontainer{
+  display:flex;
+  flex-direction: column;
+  width:100%;
+}
+
+.flexim{
+  height:auto;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.brightenim{
+  filter: brightness(150%);
+}
+
+.smoltxt{
+  font-size: 0.8em;
+}
+
+
+
+footer{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  background-color: gainsboro;
+}
+
+.link_ico{
+  color:inherit;
+}
+
+.link_ico::after{
+  display:inline-block;
+  font-size:0.5em;
+  vertical-align:middle;
+  content:"</>";
+  color:gray;
+}
+
+.linkedin_ico{
+  display:inline-block;
+}
+
+.linkedin_ico::before{
+  display:inline-block;
+  width:1.2em;
+  height:1.1em;
+  content:"in";
+  text-align:center;
+  font-family:sans-serif;
+  color:white;
+  background:#0077B5;
+  border-radius:0.2em;
+}
+
 .headshot{
     display:flex;
     width:100px;

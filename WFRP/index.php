@@ -40,15 +40,15 @@
             <h2>Timeline</h2>
             <iframe src='Timeline.html' width='100%' height='800' frameborder='0'></iframe>
             <p>
-                <a href="Timeline.html">Timeline direct link</a>
+                <a target='_blank' href='Timeline.html'>Timeline direct link</a>
             </p>
             <p>
-                <a href="https://docs.google.com/spreadsheets/d/1lL9-y3zgfcmst_YMpRLVQwzONZD615SD5-FAZtpJqh8/edit#gid=0">View this timeline's source data!</a>
+                <a target='_blank' href='https://docs.google.com/spreadsheets/d/1lL9-y3zgfcmst_YMpRLVQwzONZD615SD5-FAZtpJqh8/edit#gid=0'>View this timeline's source data!</a>
             </p>
         </section>
     </article>
     <footer>
-        <p>Page last updated: March 26, 2019</p>
+        <p>Page last updated: <?php echo date('D, jS F, Y, H:i e', getlastmod());?></p>
     </footer>
 </body>
 

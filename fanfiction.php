@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <?php include("nav.html"); ?>
+    <?php include("nav.php"); ?>
     <article id="pageContent">
         <section>
             <h3>FanFiction Writing</h3>

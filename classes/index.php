@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" media="screen" href="/style.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
     <title>MatthewD's Class Website Index</title>
 </head>
 <body>
-    <?php include("../nav.html"); ?>
+    <?php
+    $DOC_DEPTH = 1;
+    include("../nav.php");
+    ?>
     <article id="pageContent">
         <section>
             <h3>Current Education <small>(<a target="blank_" href="transcript.html">Unofficial Transcript</a>)</small></h3>

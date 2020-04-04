@@ -7,7 +7,7 @@
     <title>MatthewD's Website</title>
 </head>
 <body>
-    <?php include("nav.html"); ?>
+    <?php include("nav.php"); ?>
     <article id="pageContent">
         <header>
             <h1 class="nomarg bigheader">MatthewD's Engineering Website</h1>

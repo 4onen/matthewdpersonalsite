@@ -9,9 +9,7 @@
 </head>
 
 <body>
-    <div id="navcontainer">
-        <a id="iconLink" href="../index.html">MD</a>
-    </div>
+    <?php include("../nav.html"); ?>
     <article id="pageContent">
         <header>
             <h1 class="nomarg bigheader">Wish Fulfillment Roleplay</h1>
@@ -32,12 +30,12 @@
                 <i>now</i>
                 do we do?
             </p>
-            <p class="smoltxt">(Hint: Have breakdowns about the inconsistency of morality and play around with the concepts of species, gender,
-                and identity.)</p>
+            <small>(Hint: Have breakdowns about the inconsistency of morality and play around with the concepts of species, gender,
+                and identity.)</small>
         </section>
         <section>
             <h2>Timeline</h2>
-            <iframe src='Timeline.html' width='100%' height='800' frameborder='0'></iframe>
+            <iframe src='/WFRP/Timeline.html' width='100%' height='800' frameborder='0'></iframe>
             <p>
                 <a href="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1lL9-y3zgfcmst_YMpRLVQwzONZD615SD5-FAZtpJqh8&font=Default&lang=en&initial_zoom=2&height=650">Timeline direct link</a>
             </p>

@@ -9,7 +9,10 @@
 </head>
 
 <body>
-    <?php include("../nav.php"); ?>
+    <?php
+    $DOC_DEPTH=1;
+    include("../nav.php");
+    ?>
     <article id="pageContent">
         <section>
             <h3>Game Development</h3>
@@ -39,7 +42,7 @@
                 distance field.
             </p>
             <p>Click the image below to go to the competition entry!</p>
-            <a target="blank_" href="https://js13kgames.com/entries/peaceful-forest-walk"><img class="brightenim flexim" src="gamedev/PeacefulForestWalkSS.png" alt="Screenshot of a forest from my JS13K entry Peaceful Forest Walk"/></a>
+            <a target="blank_" href="https://js13kgames.com/entries/peaceful-forest-walk"><img class="brightenim flexim" src="PeacefulForestWalkSS.png" alt="Screenshot of a forest from my JS13K entry Peaceful Forest Walk"/></a>
             <p>Also during my study abroad, I participated in the September 2018
                 <a target="blank_" href="https://www.meetup.com/tretton37-Tech-Meetup-Stockholm/events/253971995/">Game Jam: Part Deux</a> 
                 game dev challenge, where we had 30 hours to build a game. My
@@ -56,7 +59,7 @@
             Click the screenshot below to go to the project page and try it out! Word of 
             warning: the constant camera rotation can be nauseating for some people.
             </p>
-            <a target="blank_" href="https://github.com/4onen/super-duper-fiesta"><img class="flexim" src="gamedev/sdf3.jpg" alt="Screenshot of 3 dice from my Game Jam Part Deux game: Super Duper Fiesta"/></a>
+            <a target="blank_" href="https://github.com/4onen/super-duper-fiesta"><img class="flexim" src="sdf3.jpg" alt="Screenshot of 3 dice from my Game Jam Part Deux game: Super Duper Fiesta"/></a>
             <p>Prior to university, in March 2015, I and two friends 
                 participated in the first educational silicon valley 
                 Teen Hackathon, producing the physics-based game prototype 

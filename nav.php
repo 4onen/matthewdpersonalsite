@@ -11,7 +11,7 @@ for(; $DOC_DEPTH>0; $DOC_DEPTH--){
     <nav>
         <?php
         echo "<a href='{$ROOT_URI}classes'>Classwork</a>";
-        echo "<a href='{$ROOT_URI}gamedev.php'>GameDev</a>";
+        echo "<a href='{$ROOT_URI}gamedev'>GameDev</a>";
         echo "<a href='{$ROOT_URI}fanfiction.php'>Fanfic</a>";
         echo "<a target='_blank' href='https://github.com/4onen'>GitHub</a>";
         echo "<a target='_blank' href='https://www.linkedin.com/in/4onen/'>LinkedIn</a>";

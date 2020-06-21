@@ -12,7 +12,7 @@
         <header>
             <h1 class="nomarg bigheader">MatthewD's Engineering Website</h1>
             <h1 class="nomarg medheader">Computer Engineering, Analysis, and Trickery.</h2>
-            <h1 class="nomarg smallheader">plus (<a href="fanfiction.html">fan</a>)fiction writing, roleplaying, etc...</h4>
+            <h1 class="nomarg smallheader">plus (<a href="fanfiction.php">fan</a>)fiction writing, roleplaying, etc...</h4>
         </header>
         <section>
             <h2>Computer Engineering</h2>

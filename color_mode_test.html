@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#00001D">
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: grid;
+            align-items: center;
+            text-align: center;
+            height: 100svh;
+        }
+
+        a {
+            background-color: ButtonFace;
+            color: ButtonText;
+            font-size: 2em;
+            padding-block: 2em;
+            text-decoration: none;
+        }
+
+        @media (prefers-color-scheme: light) {
+            .color-scheme-mode-test::before {
+                content: "light"
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .color-scheme-mode-test::before {
+                content: "dark"
+            }
+        }
+    </style>
+    <title>MatthewD's Light/Dark Mode Test</title>
+    <script>0 /*prevents Firefox FOUC*/</script>
+</head>
+
+<body>
+    <h1>
+        Your browser is in
+        <span class="color-scheme-mode-test"></span>
+        mode!
+    </h1>
+    <a href=".." onclick="javascript:history.back()">Back</a>
+</body>

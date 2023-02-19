@@ -1,0 +1,199 @@
+:root {
+    --timeline-page-stanford-color: #cf2e2e;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --timeline-page-lunds-bg: #875e29;
+        --timeline-page-ucsb-color-1: #003660;
+        --timeline-page-ucsb-color-2: #003660;
+        --timeline-page-ucsb-header-text-color: gold;
+        --timeline-page-escondido-bg-color: rgb(166, 22, 22);
+        --timeline-page-wilkinson-color: darkgreen;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --timeline-page-lunds-text: rgb(77, 76, 68);
+        --timeline-page-lunds-header: #875e29;
+        --timeline-page-ucsb-color-1: #DCE1E5;
+        --timeline-page-ucsb-color-2: gold;
+        --timeline-page-ucsb-header-text-color: #003660;
+        --timeline-page-stanford-text-color: white;
+        --timeline-page-escondido-header-color: rgb(166, 22, 22);
+        --timeline-page-wilkinson-color: forestgreen;
+    }
+}
+
+.timeline {
+    display: grid;
+    place-items: center;
+    width: 100%;
+}
+
+.timeline-quarters {
+    text-transform: uppercase;
+}
+
+.timeline-quarters>strong {
+    font-size: 1.4em;
+}
+
+.timeline-era {
+    position: relative;
+    margin: auto;
+    max-width: 100svw;
+    padding-top: 3em;
+    padding-bottom: 3em;
+    padding-left: 1em;
+    padding-right: 1em;
+    color: var(--text-color);
+    isolation: isolate;
+}
+
+.timeline-era::after {
+    content: "";
+    background: var(--background-color);
+    position: absolute;
+    inset: 1em 0 -5em 0;
+    z-index: -1;
+    transform: skewY(2.5deg);
+    box-shadow: 0 -2px 8px 2px rgba(0, 0, 0, 0.6);
+}
+
+.timeline-era:nth-child(even)::after {
+    transform: skewY(-2.5deg);
+}
+
+.timeline-era>.timeline-era::after {
+    transform: skewY(1.5deg);
+    bottom: 0;
+}
+
+.timeline-era>.timeline-era:nth-child(even)::after {
+    transform: skewY(-1.5deg);
+}
+
+.lunds {
+    --background-color: var(--timeline-page-lunds-bg, Canvas);
+    --header-color: var(--timeline-page-lunds-header, CanvasText);
+    --text-color: var(--timeline-page-lunds-text, CanvasText);
+    font-family: sans-serif;
+}
+
+.ucsb {
+    font-family: Avenir, "Century Gothic", sans-serif;
+}
+
+.ucsb:nth-last-child(odd) {
+    --background-color: var(--timeline-page-ucsb-color-1, Canvas);
+    --header-color: var(--timeline-page-ucsb-header-text-color, CanvasText);
+    --text-color: var(--timeline-page-ucsb-text-color-1, CanvasText);
+}
+
+.ucsb:nth-last-child(even) {
+    --background-color: var(--timeline-page-ucsb-color-2, Canvas);
+    --header-color: var(--timeline-page-ucsb-header-text-color, CanvasText);
+    --text-color: var(--timeline-page-ucsb-text-color-2, CanvasText);
+}
+
+.produkt-bold {
+    font-family: Produkt, serif;
+    font-weight: 400;
+}
+
+.avenir-bold {
+    font-family: Avenir, "Century Gothic", sans-serif;
+    font-weight: 700;
+}
+
+.font-plus-50pct {
+    font-size: 1.5em;
+}
+
+.ucsb-wordmark {
+    padding: 1.2em;
+    display: inline-block;
+}
+
+.stanford {
+    --background-color: var(--timeline-page-stanford-color, Canvas);
+    --text-color: var(--timeline-page-stanford-text-color, CanvasText);
+    --header-color: var(--text-color, CanvasText);
+}
+
+.stanford-wordmark {
+    margin: 0.6em;
+    padding: 0.6em;
+    background-color: white;
+    display: inline-flex;
+    align-items: center;
+}
+
+.stanford-wordmark-name {
+    color: var(--timeline-page-stanford-color);
+    font-family: serif;
+}
+
+.stanford-wordmark-division {
+    display: inline-block;
+    margin-top: 0;
+    margin-left: 0.2em;
+    padding-left: 0.2em;
+    border-left: 1px solid black;
+    color: black;
+    font-family: sans-serif;
+    font-weight: 200;
+}
+
+.escondido {
+    --background-color: var(--timeline-page-escondido-bg-color, Canvas);
+    --header-color: var(--timeline-page-escondido-header-color, CanvasText);
+    --text-color: var(--timeline-page-escondido-text-color, CanvasText);
+}
+
+.wilkinson {
+    --background-color: var(--timeline-page-wilkinson-color, Canvas);
+}
+
+.timeline-era>header {
+    color: var(--header-color);
+    background-color: var(--background-color);
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timeline-era>header::after {
+    --fade-height: 2em;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: var(--fade-height);
+    bottom: calc(-1 * var(--fade-height));
+    background: linear-gradient(to bottom, var(--background-color), transparent);
+}
+
+.timeline-era>header>* {
+    margin: 0;
+}
+
+.timeline-quarter {
+    padding-block: 1em;
+    border-top: 1px solid;
+    border-color: var(--text-color);
+}
+
+.timeline-quarter>header {
+    font-size: 1.5em;
+    font-family: monospace;
+}
+
+a.wordmark-link {
+    color: inherit;
+    text-decoration: inherit;
+}

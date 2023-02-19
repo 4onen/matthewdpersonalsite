@@ -60,11 +60,6 @@ footer>* {
     margin: 0;
 }
 
-.column-first-grid {
-    display: grid;
-    grid-auto-flow: row;
-}
-
 .halfscreen {
     height: 50svh;
 }
@@ -198,8 +193,8 @@ img.icon,
     display: flex;
     color: var(--text-color);
     align-items: center;
-    width: fit-content;
     text-decoration: none;
+    transform-origin: left;
     transition: scale 0.1s;
 }
 
@@ -231,6 +226,18 @@ img.icon,
 
 .iconlink:active {
     scale: initial;
+}
+
+.iconlink-grid {
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
+    justify-items: stretch;
+    align-items: center;
+}
+
+.iconlink-grid>* {
+    margin-top: 1em;
 }
 
 .centercolumn {

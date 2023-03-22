@@ -1,3 +1,5 @@
+"use strict";
+
 const TIME_OPTIONS = {
     hour12: true,
     hour: '2-digit',

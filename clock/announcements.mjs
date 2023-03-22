@@ -1,3 +1,4 @@
+"use strict";
 
 window.addEventListener("DOMContentLoaded", () => {
     const announcements = document.querySelector("#announcements");

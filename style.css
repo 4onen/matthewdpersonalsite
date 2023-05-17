@@ -104,8 +104,54 @@ footer>* {
 
 img.icon,
 .icon.panflag,
-.icon.darklight {
+.icon.darklight,
+.icon.abouticon,
+.icon.timelineicon {
     border: 1px solid var(--text-color);
+}
+
+.abouticon {
+    position: relative;
+    background-color: transparent;
+    isolation: isolate;
+}
+
+.icon.abouticon::before {
+    content: "?";
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-size: 1.4em;
+    font-family: "Noto Color Emoji",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        Times,
+        serif,
+        LastResort;
+    text-align: center;
+    vertical-align: center;
+}
+
+.timelineicon {
+    position: relative;
+    background-color: transparent;
+    isolation: isolate;
+}
+
+.icon.timelineicon::before {
+    content: "🗓";
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-size: 1.4em;
+    font-family: "Noto Color Emoji",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        Times,
+        serif,
+        LastResort;
+    text-align: center;
+    vertical-align: center;
 }
 
 .panflag {

@@ -8,6 +8,7 @@
 
 :root {
     box-sizing: border-box;
+    color-scheme: dark light;
 }
 
 body {
@@ -54,4 +55,45 @@ body {
     min-height: 10svh;
     resize: vertical;
     background: transparent;
+}
+
+#welcomedialog {
+    width: 32rem;
+    margin: auto;
+    border: 1px solid #ccc;
+}
+
+#welcomedialog h1 {
+    font-size: 3em;
+    font-weight: 800;
+    text-align: center;
+    margin: 1rem;
+}
+
+#welcomedialog p {
+    padding: 1rem;
+}
+
+#welcomedialog button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 2em;
+    font-weight: 800;
+    margin: auto;
+}
+
+#welcomedialogreopen {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    --size: 1.5em;
+    font-size: var(--size);
+    height: var(--size);
+    width: var(--size);
+    border-top-left-radius: 1rem;
+}
+
+noscript * {
+    background-color: ButtonFace;
 }

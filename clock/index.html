@@ -11,17 +11,57 @@
     <title>Clock</title>
     <script src="clock.mjs"></script>
     <script src="announcements.mjs"></script>
+    <noscript>
+        <style>
+            .jsonly {
+                display: none !important;
+            }
+        </style>
+    </noscript>
 </head>
 
 <body>
-    <div id="date">Enable Javascript to put the current date here!</div>
-    <div id="time">Enable Javascript to put the current time here!</div>
-    <div id="announcements"></div>
-    <details>
+    <div id="date" class="jsonly">Weekday, Month DD, YYYY</div>
+    <div id="time" class="jsonly">--:--:-- -M</div>
+    <div id="announcements" class="jsonly"></div>
+    <details class="jsonly">
         <summary>Edit</summary>
         <textarea id="announcement-input"
             placeholder="Announcements html"></textarea>
     </details>
+    <dialog id="welcomedialog" open="">
+        <form>
+            <h1>Welcome to the Clock!</h1>
+            <p>This app provides a clean, ad-free clock with an editing
+                interface for adding announcements with full HTML formatting.
+                It also preserves announcements across page reloads
+                (until the browser cache is cleared.)
+            </p>
+            <p>Time is collected from the local computer's clock only.<br />
+                No remote time synchronization is performed.
+            </p>
+            <p>Comments and questions should be directed to <a
+                    href="https://sites.engineering.ucsb.edu/~mdupree">Matthew
+                    Dupree</a> for as long as this webapp remains available.</p>
+            <noscript>
+                <h2>Javascript required!</h2>
+                <p>The page will not function without Javascript. Please enable
+                    Javascript or choose a more modern browser.</p>
+            </noscript>
+            <div class="jsonly">
+                <button formmethod="dialog">Okay</button>
+            </div>
+            <p>Last update 2023-05-16 : Add welcome dialog</p>
+        </form>
+    </dialog>
+    <button id="welcomedialogreopen" class="jsonly"
+        onclick="welcomedialog.showModal()">?</button>
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            welcomedialog.close();
+            welcomedialog.showModal();
+        });
+    </script>
 </body>
 
 </html>

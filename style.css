@@ -96,62 +96,15 @@ footer>* {
 
 .icon {
     display: inline-block;
-    width: 1.8em;
-    height: 1.8em;
-    margin: 0.5em;
+    width: calc(0.8svw + 2rem);
+    height: calc(0.8svw + 2rem);
+    margin: 0.5rem;
     background-color: var(--text-color);
 }
 
 img.icon,
-.icon.panflag,
-.icon.darklight,
-.icon.abouticon,
-.icon.timelineicon {
+.icon.panflag {
     border: 1px solid var(--text-color);
-}
-
-.abouticon {
-    position: relative;
-    background-color: transparent;
-    isolation: isolate;
-}
-
-.icon.abouticon::before {
-    content: "?";
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    font-size: 1.4em;
-    font-family: "Noto Color Emoji",
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        Times,
-        serif,
-        LastResort;
-    text-align: center;
-    vertical-align: center;
-}
-
-.timelineicon {
-    position: relative;
-    background-color: transparent;
-    isolation: isolate;
-}
-
-.icon.timelineicon::before {
-    content: "🗓";
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    font-size: 1.4em;
-    font-family: "Noto Color Emoji",
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        Times,
-        serif,
-        LastResort;
-    text-align: center;
-    vertical-align: center;
 }
 
 .panflag {
@@ -159,39 +112,29 @@ img.icon,
     color: var(--accent-color);
 }
 
-.icon.darklight {
+
+.texticon {
     position: relative;
     background-color: transparent;
     isolation: isolate;
+    font-size: 1.4em;
+    text-align: center;
+    vertical-align: center;
 }
 
-@media (prefers-color-scheme: light) {
-    .icon.darklight::before {
-        content: "☀";
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        font-size: 1.4em;
-        font-family: "Noto Color Emoji",
-            "Apple Color Emoji",
-            "Segoe UI Emoji",
-            Times,
-            serif,
-            LastResort;
-        text-align: center;
-        vertical-align: center;
-    }
+.icon.darklight::before {
+    content: "☀";
+    font-family: "Noto Color Emoji",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        Times,
+        serif,
+        LastResort;
 }
 
 @media (prefers-color-scheme: dark) {
     .icon.darklight::before {
         content: "🌙";
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        font-size: 1.6em;
-        text-align: center;
-        vertical-align: center;
     }
 }
 

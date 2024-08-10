@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#00001D">
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
+    <title>MatthewD's Blog</title>
+    <script>0 /*prevents Firefox FOUC*/</script>
+</head>
+
+<body>
+    <header class="frontpage blueblack_gradient">
+        <h1><a href="..">Matthew Dupree</a></h1>
+        <code>@4onen</code>
+    </header>
+    <section class="centercolumn box">
+        <h2>Entries</h2>
+        <ul>
+            <li><a href="DisplayablesInAwSWSideImages.html">Side Images'
+                    Displayables</a> (2023-12-20)</li>
+            <li><a href="AwSWModLoadOrder.html">AwSW Mod Load Order</a> (2024-08-10)</li>
+        </ul>
+    </section>
+    <section class="centercolumn box">
+        <h1 id="whats-this">What’s this?</h1>
+        <p>This blog is a description of some of the design decisions and
+            interfaces in Ren’Py underlying many of my AwSW mods. Here, I’m
+            trying to explain the ideas that led to the code in the final
+            package, as well as help preserve and describe the Ren’Py 6.99
+            interfaces necessary to mod <em>Angels with Scaly Wings</em>.
+        </p>
+        <p>It’s targeted at people who know the basics of modding the game, but
+            who want to dig deeper to create more advanced functionality, as
+            visible in the mods by EvilChaosKnight, 4onen, Linda, and the AwSW
+            modtools themselves.</p>
+        <h1 id="why-make-this">Why make this?</h1>
+        <p>I’ve noticed recently that the Historic Ren’Py Wiki is slowly being
+            replaced on Google Search results by the new Ren’Py documentation.
+            While it’s wonderful that the Ren’Py project is finally reaching a
+            new level of documentation standards, this older wiki is critical to
+            understanding and modifying the game Angels with Scaly Wings (and
+            other similarly old Ren’Py titles.) As such, I’m hoping to preserve
+            some of the most useful code (at least among the pieces I’ve used)
+            to help future modders come back to older titles and at least have a
+            foothold into these wonderful games’ engines.</p>
+        <h1 id="f.a.q.">F.A.Q.</h1>
+        <p>First, the title of this section is a lie. This page was written
+            before this blog project was released, so these questions are what I
+            assume might be asked.</p>
+        <h2 id="how-regularly-will-these-come-out">How regularly will these come
+            out?</h2>
+        <p>No idea! Whenever each is done, and going until I get bored, I guess?
+        </p>
+        <h2 id="what-content-are-you-planning-to-cover">What content are you
+            planning to cover?</h2>
+        <p>I don’t have a clear plan going forward, but some topics I’d like to
+            hit are: * The image interfaces used to make my <a
+                href="https://github.com/4onen/AwSW-Side-Images">Side Images</a>
+            mod (most critically <code>im.Composite</code>, which is used in
+            almost all my mods to break displayed images into layered pieces and
+            vastly decrease mod file sizes.) * The image recoloration tricks
+            used in <a
+                href="https://github.com/4onen/AwSW-Bryce-Teetotaller">Teetotaller</a>
+            and <a
+                href="https://github.com/4onen/AwSW-4onen-Aesthetic-Tweaks">4onen’s
+                Aesthetic Tweaks</a> to match player colors. * The Ren’Py
+            Abstract Syntax Tree (AST) which represents the story in the loaded
+            game (and how mods “hook” into it) * The Ren’Py call stack, which
+            can be used to vastly reduce code duplication in mods. * The basics
+            of the Ren’Py Screen Language 2, as used in <em>Magmalink</em> Mod
+            Settings menus * The Ren’Py Animation Transformation Language (ATL)
+            used by most of my mods to slide sprites around better than the base
+            game does.</p>
+        <h2 id="what-skill-level-is-necessary-to-understand-this">What skill
+            level is necessary to understand this?</h2>
+        <p>I’m assuming some understanding of Python, as I’m targeting this
+            series at future modders interested in digging into more complex
+            functionality rather than true beginners. Again, if you’re
+            interested in modding AwSW but don’t have any idea where to start,
+            see Linda’s excellent <a
+                href="https://gitlab.com/jakzie2/awsw-magmalink/-/wikis/home">Magmalink-centered
+                tutorials</a>.</p>
+    </section>
+    <footer>
+        <span itemprop="https://schema.org/copyrightNotice">
+            © <span itemprop="https://schema.org/copyrightYear">2023</span>
+            <span itemprop="https://schema.org/copyrightHolder" itemscope
+                itemtype="https://schema.org/Person">
+                <span itemprop="https://schema.org/givenName">Matthew</span>
+                <span itemprop="https://schema.org/familyName">Dupree</span>
+            </span>
+        </span>
+        <span>
+            Updated:
+            <time itemprop="https://schema.org/lastReviewed"
+                datetime="2023-12-20">2023-12-20</time>
+        </span>
+    </footer>
+</body>
+
+</html>

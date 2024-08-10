@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="4onen" />
+            <meta name="date" content="2023-12-20" />
+            <meta name="theme-color" content="#00001D">
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
+    <title>MatthewD's Blog - Side Images’ Displayables</title>
+    <style>
+        code{white-space: pre-wrap;}
+        span.smallcaps{font-variant: small-caps;}
+        span.underline{text-decoration: underline;}
+        div.column{display: inline-block; vertical-align: top; width: 50%;}
+        div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+        ul.task-list{list-style: none;}
+        pre > code.sourceCode { white-space: pre; position: relative; }
+        pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+        pre > code.sourceCode > span:empty { height: 1.2em; }
+        code.sourceCode > span { color: inherit; text-decoration: inherit; }
+        div.sourceCode { margin: 1em 0; }
+        pre.sourceCode { margin: 0; }
+        @media screen {
+        div.sourceCode { overflow: auto; }
+        }
+        @media print {
+        pre > code.sourceCode { white-space: pre-wrap; }
+        pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+        }
+        pre.numberSource code
+          { counter-reset: source-line 0; }
+        pre.numberSource code > span
+          { position: relative; left: -4em; counter-increment: source-line; }
+        pre.numberSource code > span > a:first-child::before
+          { content: counter(source-line);
+            position: relative; left: -1em; text-align: right; vertical-align: baseline;
+            border: none; display: inline-block;
+            -webkit-touch-callout: none; -webkit-user-select: none;
+            -khtml-user-select: none; -moz-user-select: none;
+            -ms-user-select: none; user-select: none;
+            padding: 0 4px; width: 4em;
+            color: #aaaaaa;
+          }
+        pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+        div.sourceCode
+          {   }
+        @media screen {
+        pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+        }
+        code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+        code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+        code span.at { color: #7d9029; } /* Attribute */
+        code span.bn { color: #40a070; } /* BaseN */
+        code span.bu { } /* BuiltIn */
+        code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+        code span.ch { color: #4070a0; } /* Char */
+        code span.cn { color: #880000; } /* Constant */
+        code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+        code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+        code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+        code span.dt { color: #902000; } /* DataType */
+        code span.dv { color: #40a070; } /* DecVal */
+        code span.er { color: #ff0000; font-weight: bold; } /* Error */
+        code span.ex { } /* Extension */
+        code span.fl { color: #40a070; } /* Float */
+        code span.fu { color: #06287e; } /* Function */
+        code span.im { } /* Import */
+        code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+        code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+        code span.op { color: #666666; } /* Operator */
+        code span.ot { color: #007020; } /* Other */
+        code span.pp { color: #bc7a00; } /* Preprocessor */
+        code span.sc { color: #4070a0; } /* SpecialChar */
+        code span.ss { color: #bb6688; } /* SpecialString */
+        code span.st { color: #4070a0; } /* String */
+        code span.va { color: #19177c; } /* Variable */
+        code span.vs { color: #4070a0; } /* VerbatimString */
+        code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+            <script>0 /*prevents Firefox FOUC*/</script>
+</head>
+
+<body>
+    <header class="frontpage blueblack_gradient">
+        <h1><a href="..">Matthew Dupree</a>: <a href=".">Blog</a></h1>
+        <code>@4onen</code>
+    </header>
+    <header class="centercolumn box">
+                <h1 class="blog-title">Side Images’ Displayables</h1>
+                                <p class="blog-author">4onen</p>
+                        <p class="blog-date">2023-12-20</p>
+            </header>
+        <section class="centercolumn box">
+        <nav id="TOC" role="doc-toc" aria-label="Table of Contents">
+                        <ul>
+                        <li><a href="#introduction">Introduction</a></li>
+                        <li><a href="#side-images-results">Side Images: Results</a></li>
+                        <li><a href="#how-to-make-it-happen">How to make it happen</a>
+                        <ul>
+                        <li><a href="#cutting-out-the-faces">Cutting out the faces</a></li>
+                        <li><a href="#the-scale-of-the-problem">The Scale of the Problem</a></li>
+                        <li><a href="#the-code">The Code</a></li>
+                        <li><a href="#what-happens-when-a-character-expression-doesnt-have-a-side-image">What happens when a character expression doesn’t have a side image?</a></li>
+                        </ul></li>
+                        <li><a href="#digging-deeper">Digging Deeper</a>
+                        <ul>
+                        <li><a href="#how-much-will-all-these-crops-and-scales-and-flips-lag-my-game">How much will all these <code>Crop</code>s and <code>Scale</code>s and <code>Flip</code>s lag my game?</a></li>
+                        <li><a href="#imagebase-vs-displayable"><code>ImageBase</code> vs <code>Displayable</code></a></li>
+                        <li><a href="#how-does-renpy-know-which-side-image-to-use">How does Ren’Py know which side image to use?</a></li>
+                        </ul></li>
+                        <li><a href="#conclusion">Conclusion</a></li>
+                        </ul>
+        </nav>
+    </section>
+        <section class="centercolumn box">
+        <h2 id="introduction">Introduction</h2>
+        <p>This post will cover how Ren’Py can crop and scale image assets to provide slick and accessible image hints for the speaking character without exporting hundreds of copies of what’s already in the game. We do this using Ren’Py’s “Side Images” system in collaboration <code>display.im</code> image combinators that provides near-infinite possibilities for cropping, scaling, and flipping assets.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+        <p>First, let’s start with some history. Shortly after publishing my <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2506645207">first mod</a> in the Angels with Scaly Wings (<a href="https://angelswithscalywings.com/">AwSW</a>) modding community, I was informed of the <em>Side Faces</em> mod made by CalamityLime, now removed from the internet. This mod was made by manually cutting every character’s face out of their different sprite expression files using an image editor, then aligning them to be used as face boxes in the lower left corner of the screen when the character is talking. The ability to place boxes in that corner, known as the “side image” system was a native feature of Ren’Py, but required specifically placed and named assets, which were a pain and a half to create I’m sure.</p>
+        <p>With the original mod already removed by that time, and a dyslexic friend struggling with keeping track of the speaking character, I felt there had to be a better way to do side faces in the Ren’Py engine that wouldn’t require replicating that effort. In the end, I did have to write a small amount of code for every character expression, though it was far less work than cutting out every face by hand.</p>
+        <p>The result was the <strong>Side Images</strong> mod, which I published on the <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2521431664">AwSW Steam Workshop</a> and <a href="https://github.com/4onen/AwSW-Side-Images">GitHub</a></p>
+        <h2 id="side-images-results">Side Images: Results</h2>
+        <p><img src="SideImagesDisplayables/Remy%20Look.png" alt="Remy giving a sideways look" /> <img src="SideImagesDisplayables/Remy%20Blush.png" alt="Remy blushing" /> <img src="SideImagesDisplayables/Anna%20Sad.png" alt="Anna looking sad" /> <img src="SideImagesDisplayables/Anna%20Smug.png" alt="Anna looking smug" /></p>
+        <p>That’s right! Not only do we have the speaking character, we also have their expression provided automatically!</p>
+        <h2 id="how-to-make-it-happen">How to make it happen</h2>
+        <p>In Ren’Py 6.99, as used by AwSW, a <em>side image</em> is any image where the <em>tag</em> (the first word of the image name) is the word <code>side</code><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. Ren’Py will append the tag and expression of the currently speaking character (e.g. <code>emera laugh b flip</code>) to create the full image specifier it searches for (e.g. <code>side emera laugh b flip</code>.) Taking this image specifier, it loads the associated displayable for that image specifier, which is made accessible to the Ren’Py Say screen (where the character text appears) with the <code>SideImage()</code> displayable object.</p>
+        <p>Thus, to add expressions to the AwSW characters, all I had to do was define the side image specifiers to point at ready-to-use cutouts of the character faces. Great! But how do we cut out the faces?</p>
+        <h3 id="cutting-out-the-faces">Cutting out the faces</h3>
+        <p>One nice part of AwSW’s development is that every character image has the exact same size across all expressions, and almost always puts the character in the same spot across those expressions.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> This is likely an artefact of the artistry process, as the different expressions appear to be small changes from some base. It may also be intentional, as it has the benefit that changing the character’s expression doesn’t cause the character to move. Either way, for us, the fact that the expressions for a given character are the same mean we can use the same bounding box for every expression of a character, saving us lots of effort!</p>
+        <p>The space we need to put the character’s face into, next to the text, is 250 pixels wide by 300 pixels tall.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> All we need to do is load up a given character’s sprite in an image editor, choose the box we want, and…</p>
+        <figure>
+        <img src="SideImagesDisplayables/EmeraTooBig.png" alt="" /><figcaption>GIMP Screenshot showing Emera’s face is bigger than the 250x300 box</figcaption>
+        </figure>
+        <p>… Oh. The box is smaller than her face.</p>
+        <h3 id="the-scale-of-the-problem">The Scale of the Problem</h3>
+        <p>As it turns out, cutting the faces out isn’t all we need to do. Most characters’ faces are simply larger than the space we want to insert them into, meaning we’ll get them strangely cropped down to a rectangle and may only get a fraction of their emotional impact. We need to scale the faces down to fit the box. But if we do that first, then we’ll wind up dealing with a coordinate space that doesn’t match our editor, and what if the scaling isn’t right, and, and, and.</p>
+        <p>What if we took the box, <em>then</em> scaled it down? If we use a box that’s twice the target size, we should have a perfect linear interpolation of two pixels for every pixel in the result, preserving as much detail as we can with as few artifacts as possible.</p>
+        <figure>
+        <img src="SideImagesDisplayables/EmeraJustRight.png" alt="" /><figcaption>GIMP Screenshot showing Emera’s face fitting in a 500x600 box</figcaption>
+        </figure>
+        <p>Much better! Scaling up the crop box, then scaling down the result was actually the trick I used with every single dragon. Interestingly, the humans were all small enough that I could just use the 250x300 box directly.</p>
+        <p>But now that we’ve chosen the box, how do we explain that to Ren’Py? Those who remember the first part will also notice she’s facing the wrong way.</p>
+        <h3 id="the-code">The Code</h3>
+        <p>Ren’Py’s <code>display.im</code> module provides a number of helpful <code>ImageBase</code> objects, which are either a directly loaded image themselves, or take one as input and perform some operation on it. To tell Ren’Py we only need some rectangle out of an image, we use the <code>Crop()</code> displayable, which takes an image and a rectangle and returns a new image that is only the rectangle.</p>
+        <p>I’ll demonstrate this in parallel with two different images: one of Emera and one that’s a placeholder image with placeholder variable names.</p>
+        <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="im">from</span> renpy.display <span class="im">import</span> im</span>
+        <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>cropped_image <span class="op">=</span> im.Crop(<span class="st">&quot;image.png&quot;</span>, (x, y, width, height))</span>
+        <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>cropped_emera <span class="op">=</span> im.Crop(<span class="st">&quot;cr/emera_normal.png&quot;</span>, (<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">500</span>, <span class="dv">600</span>))</span></code></pre></div>
+        <p>The <code>Crop()</code> displayable is a subclass of <code>ImageBase</code>, so it can be used anywhere an image can be used. We can give the filename to it because its constructor will try to convert its first argument into an <code>ImageBase</code>, including by loading the image provided. The rectangle we provide after that is a tuple of four numbers: The <code>x</code> and <code>y</code> coordinates of the top-left corner of the rectangle, and the <code>width</code> and <code>height</code> of the rectangle. The <code>Crop()</code> displayable will then represent a new image that is only the rectangle we specified. This image can also be passed to other <code>ImageBase</code> objects, such as <code>Scale()</code>.</p>
+        <div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>scaled_image <span class="op">=</span> im.Scale(cropped_image, new_width, new_height)</span>
+        <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>scaled_emera <span class="op">=</span> im.Scale(cropped_emera, <span class="dv">250</span>, <span class="dv">300</span>)</span></code></pre></div>
+        <p>The <code>Scale()</code> displayable takes an image and two numbers, the <code>width</code> and <code>height</code> of the new image, and returns a new image that is the original image scaled to the new size. This has brought our Emera face down to the right size, but she’s still facing the wrong way. We can fix that with the <code>Flip()</code> displayable.</p>
+        <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>flipped_image <span class="op">=</span> im.Flip(image, horizontal<span class="op">=</span><span class="va">True</span>, vertical<span class="op">=</span><span class="va">False</span>)</span>
+        <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>flipped_emera <span class="op">=</span> im.Flip(scaled_emera, horizontal<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+        <p>The <code>Flip()</code> displayable takes an image and two booleans, <code>horizontal</code> and <code>vertical</code>, and returns a new image that is the original image flipped horizontally and/or vertically. At least one of them must be <code>True</code>, or the <code>Flip()</code> displayable will raise an error. (They default to False, so you may leave them off as I’ve done in the Emera example.)</p>
+        <p>Putting all of these steps together, we can create a displayable that will take an image, crop it to the right size, scale it down, and flip it horizontally. That looks like this:</p>
+        <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>image_result <span class="op">=</span> im.Flip(im.Scale(im.Crop(image, (x, y, width, height)), new_width, new_height), horizontal<span class="op">=</span><span class="va">True</span>)</span>
+        <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>emera_result <span class="op">=</span> im.Flip(im.Scale(im.Crop(<span class="st">&quot;cr/emera_normal.png&quot;</span>, (<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">500</span>, <span class="dv">600</span>)), <span class="dv">250</span>, <span class="dv">300</span>), horizontal<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+        <p>The final step is to register this displayable with Ren’Py so that it knows the name <code>side emera normal</code> refers to this displayable. There are two ways to do this, one in Ren’Py code and one in Python code:</p>
+        <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># Ren&#39;Py</span></span>
+        <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co"># If you are writing your own mod, don&#39;t use this one, use the Python one below.</span></span>
+        <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>image side image <span class="op">=</span> im.Flip(im.Scale(im.Crop(image, (x, y, width, height)), new_width, new_height), horizontal<span class="op">=</span><span class="va">True</span>)</span>
+        <span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>image side emera normal <span class="op">=</span> im.Flip(im.Scale(im.Crop(<span class="st">&quot;cr/emera_normal.png&quot;</span>, (<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">500</span>, <span class="dv">600</span>)), <span class="dv">250</span>, <span class="dv">300</span>), horizontal<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+        <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># ... inside your mod&#39;s python file ...</span></span>
+        <span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a></span>
+        <span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    dependencies <span class="op">=</span> [<span class="st">&quot;?Side Images&quot;</span>] <span class="co"># Add Side Images as an optional dependency</span></span>
+        <span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
+        <span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>    <span class="kw">def</span> mod_load(<span class="va">self</span>):</span>
+        <span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>        <span class="co"># ... other code ...</span></span>
+        <span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>        <span class="cf">if</span> mod_info.has_mod(<span class="st">&quot;Side Images&quot;</span>):</span>
+        <span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>            <span class="im">import</span> renpy.exports</span>
+        <span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>            <span class="co"># ... other image definitions ...</span></span>
+        <span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>            renpy.exports.image(<span class="st">&quot;side emera normal&quot;</span>,</span>
+        <span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>                im.Flip(</span>
+        <span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>                    im.Scale(</span>
+        <span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>                        im.Crop(<span class="st">&quot;cr/emera_normal.png&quot;</span>, (<span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">500</span>, <span class="dv">600</span>)), </span>
+        <span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>                        <span class="dv">250</span>, <span class="dv">300</span>,</span>
+        <span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>                    ), </span>
+        <span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>                    horizontal<span class="op">=</span><span class="va">True</span>,</span>
+        <span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>                )</span>
+        <span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>            )</span>
+        <span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>            <span class="co"># ... other image definitions ...</span></span>
+        <span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a>        <span class="co"># ... the rest of your mod ...</span></span></code></pre></div>
+        <p>That is quite a chunk of code to write for every single expression of every single character. Fortunately, looking at the Ren’Py code, you cans see it has a very regular structure with only a few numbers changing. When I wrote the base Side Images mod, I wrote a script that would generate the code for me from a simple list of all the expressions which is still available on the <a href="https://github.com/4onen/AwSW-Side-Images">Side Images GitHub</a>. (You do <em>not</em> need to use this script to make your own mod; it’s a convenience tool for me and utterly unhelpful for anyone else.)</p>
+        <p>In the python example here, I’ve also included a check to see if the Side Images mod is installed. This is to allow other mods to use my mod as a flag to indicate that the user wants side images, and then they can install their own specific side images for their mod, and the whole system works together.</p>
+        <h3 id="what-happens-when-a-character-expression-doesnt-have-a-side-image">What happens when a character expression doesn’t have a side image?</h3>
+        <p>A great thing about Ren’Py’s displayable lookup is that, after the tag, choice of an image is split into two parts: required and optional. (See <code>renpy/display/image.py:654</code>.) Side image lookup considers all attributes to be optional. The image lookup algorithm will then select the image with the longest set of attributes that all fall into optional. This means we can leave attributes off our side images (e.g. not creating <code>flip</code> variants) and the system will still work (it will find the unflipped side image.)</p>
+        <p>This extends further to a smooth fallback under modded expressions (or simply expressions I forgot to add.) For example, imagine someone adds <code>emera blush b</code> and <code>emera blush b flip</code> with a mod. By adding the image <code>side emera</code> with the same displayable as <code>side emera normal</code>, we can imagine the lookup algorithm as trying <code>side emera blush b flip</code>, falling back to <code>side emera blush b</code>, falling back again to <code>side emera blush</code>, then finally selecting our <code>side emera</code> for which we do have a side image. We lose Emera’s true expression in the side image, but hopefully the spritework onscreen will fill that in – we’re at least still indicating the speaking character and not showing an error to the user.</p>
+        <p>Finally, this fallback does not override side images added by mods, allowing seamless interoperation to be implemented from their side if they so choose, but without requiring it to still achieve a good user experience.</p>
+        <h2 id="digging-deeper">Digging Deeper</h2>
+        <p>If all you want to do is make your own side images, you can stop here. If you want to know more about how the engine works, read on!</p>
+        <h3 id="how-much-will-all-these-crops-and-scales-and-flips-lag-my-game">How much will all these <code>Crop</code>s and <code>Scale</code>s and <code>Flip</code>s lag my game?</h3>
+        <p>The answer to this may be quite surprising to you, but all the <code>Crop</code>s and <code>Scale</code>s and <code>Flip</code>s are actually <em>very</em> fast. This is because Ren’Py has a very powerful image cache that stores the results of all of these operations. When you use a <code>Crop()</code> displayable, Ren’Py will check its cache to see if it already has a cropped version of the image you’re asking for. If it does, it will return that image instead of creating a new one. This means that, if you use the same cropped image in multiple places, Ren’Py will only have to crop it once, and then it will be able to use the cached version everywhere else. This is also true for <code>Scale()</code> and <code>Flip()</code>.</p>
+        <h3 id="imagebase-vs-displayable"><code>ImageBase</code> vs <code>Displayable</code></h3>
+        <p>Throughout this article I’ve been using the term displayable for things, even though I specified explicitly that <code>Crop()</code>, <code>Scale()</code>, and <code>Flip()</code> are all <code>ImageBase</code>s. This is because <code>Displayable</code> is the base class of <code>ImageBase</code>; all <code>ImageBase</code>s are <code>Displayable</code>s, they just explicitly represent an image.</p>
+        <p><code>Displayable</code>s are the core of Ren’Py’s rendering system, and are responsible for all of the rendering that happens onscreen. <code>Displayable</code>s are also responsible for the layout of the screen, and can be used to create complex interfaces or animations of images, text, and other elements. <code>ImageBase</code>, however, focuses solely on high-efficiency rendering of images and their loading and rendering.</p>
+        <p>The distinction may sound trivial, but it’s important to understand that <code>ImageBase</code> is a much lower-level facility. Once something has left the subset that is <code>ImageBase</code>, it can no longer be manipulated with things like <code>Crop()</code>, <code>Scale()</code>, or <code>Flip()</code>, nor any of the other useful transforms in <code>renpy.display.im</code>. While an <code>ImageBase</code> can be used anywhere a <code>Displayable</code> is used, the reverse is not true.</p>
+        <p>Fundamentally, <code>ImageBase</code>s are considered to be static images, while <code>Displayable</code>s are considered to be dynamic. This is why <code>ImageBase</code>s are so much more efficient: they never change, so the game knows they can always be pre-rendered and cached, while <code>Displayable</code>s usually must be re-rendered every time they are used. This is also why <code>ImageBase</code>s are so much more limited: they can’t be changed once they’re created, while <code>Displayable</code>s can be changed at any time so long as their cache entry is invalidated (handled automatically by all of the combinators Ren’Py provides.)</p>
+        <h3 id="how-does-renpy-know-which-side-image-to-use">How does Ren’Py know which side image to use?</h3>
+        <p>We already went over Ren’Py’s image lookup algorithm, but how does it know which character is speaking? The answer is that Ren’Py keeps track of the speaking character’s side image in a variable called <code>_side_image</code>. This variable is set every interaction (of which the <code>Say</code> statement is one example) and is used by the <code>SideImage()</code> displayable to choose which side image to display.</p>
+        <p>A lot at once? Don’t worry. We’ll keep breaking it down.</p>
+        <h4 id="how-does-renpy-know-which-character-is-speaking">How does Ren’Py know which character is speaking?</h4>
+        <p>Whenever a character speaks, that line is known as a <code>Say</code> statement. (This includes characters that don’t have names like the narrators <code>m</code> and NVL-narrator <code>n</code>.) The <code>Say</code> statement is a bunch of code that finishes any unfinished transitions, sets up the game to write out the text of your line, and then pause until the player clicks. One of its key responsibilities, though, is to actually <em>show</em> the text of the line. To do this, it asks the <code>say</code> <em>screen</em> to display the text.</p>
+        <p>The <code>say</code> screen is a <code>Screen</code> object that represents the layout of the textbox that appears whenever a character is speaking. It is responsible for displaying the text of the line, the name of the character speaking, and the side image of the character speaking. It receives the text of the line and the <code>Character</code> object of the speaking character from the <code>Say</code> statement, and then gets to choose what to display.</p>
+        <p>When Side Images fails in AwSW, it’s almost always because the line is intentionally not supposed to show a character’s name, so the associated <code>Character</code> object is not provided. This leads to not having an image tag to look up, which leads to not having a side image to show.</p>
+        <h4 id="how-does-the-say-screen-know-what-to-display">How does the <code>say</code> screen know what to display?</h4>
+        <p>The AwSW <code>say</code> screen is actually a complex, so we’ll only look at the part that’s relevant to side images. In AwSW’s <code>screens.rpy</code>, on line 55 (the 2nd to last of the <code>say</code> screen) we see the following code:</p>
+        <div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>    <span class="cf">if</span> side_image:</span>
+        <span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>        add side_image</span>
+        <span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    <span class="cf">else</span>:</span>
+        <span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>        add SideImage() xalign <span class="fl">0.0</span> yalign <span class="fl">1.0</span> </span></code></pre></div>
+        <p>This tells us that if the screen was given a <code>side_image</code> by the <code>Say</code> statement, it will use that one. Otherwise, it will use the <code>SideImage()</code> displayable.</p>
+        <p>In all of AwSW, only the <code>SideImage()</code> path is taken.</p>
+        <h4 id="how-does-the-sideimage-displayable-know-what-to-display">How does the <code>SideImage()</code> displayable know what to display?</h4>
+        <p><code>SideImage()</code> is a special displayable that will show whatever displayable is stored in the Ren’Py default variable store’s <code>_side_image</code> variable. If you try setting this variable yourself, however, you may wind up confused that it doesn’t ever show what you put in it. This is because, every interaction (every <code>Say</code> statement, every pause) Ren’Py will set the <code>_side_image</code> variable to the side image of the speaking character. This means that, if you set it yourself, it will be overwritten the next time a character speaks.</p>
+        <h4 id="how-does-renpy-know-which-side-image-to-use-1">How does Ren’Py know which side image to use?</h4>
+        <p>The side image engine is called every time an interaction begins and chooses a new side image based on the speaker of that interaction (See <code>renpy/common/00sideimage.rpy:63</code> which calls <code>renpy/exports.py:2720</code> which then uses the <code>choose_image</code> algorithm from <code>renpy/display/image.py:654</code>.)</p>
+        <p>And that’s it! By passing information from the <code>Say</code> statement of the current line, Ren’Py can store away the speaking character’s side image every single time someone speaks, making sure we always have the right side image for the right character.</p>
+        <h4 id="how-does-renpy-know-which-expression-to-use">How does Ren’Py know which <em>expression</em> to use?</h4>
+        <p>If you look closely in the function at <code>renpy/exports.py:2720</code>, you’ll see that, if given a speaking character’s <code>image_tag</code>, it will run the lines</p>
+        <div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>image_layer <span class="op">=</span> default_layer(layer, image_tag)</span>
+        <span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>attrs <span class="op">=</span> (image_tag,) <span class="op">+</span> images.get_attributes(image_layer, image_tag)</span></code></pre></div>
+        <p>AwSW never uses layers, so we can ignore the first line. The second line asks the layer (always the default) to tell us what attributes the image has. This is what tells us the character’s expression! These attributes are then used to choose the side image, through means discussed before.</p>
+        <h4 id="where-does-the-_side_image-variable-come-from">Where does the <code>_side_image</code> variable come from?</h4>
+        <p><code>renpy/common/00sideimage.rpy</code> is loaded by the engine during init stage -1650, so before the init blocks of the game, during the Ren’Py-only initialization. It also performs some initialization (by setting some variables) at init +1650. This side image system keeps track of the side image sprite for the speaking character, so that the <code>SideImage()</code> displayable in the default store provides the side images to the speaking menu.</p>
+        <h2 id="conclusion">Conclusion</h2>
+        <p>As far as the Side Images system goes, that’s all there is to it. The rest of the implementation is just the <code>SideImage()</code> displayable and the <code>side</code> image tag.</p>
+        <p>If you’d like to understand more about how Ren’Py works, I recommend starting with the <a href="https://www.renpy.org/doc/html/">Ren’Py documentation</a>. While a bit sparse and increasingly less relevant to AwSW’s version of Ren’Py, it still has clear descriptions of many of the objects and tools you’ll run across as you begin to delve even deeper into the engine. Good luck!</p>
+        <section class="footnotes" role="doc-endnotes">
+        <hr />
+        <ol>
+        <li id="fn1" role="doc-endnote"><p>While technically infinite because you’re able to use floating-point numbers for position selection, you’ll find it tends to use very fast bilinear interpolation to scale images, which can quickly cause artifacts for subpixel work. This is why I’ve opted almost universally to use integer pixel coordinates when I define my displayables.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+        <li id="fn2" role="doc-endnote"><p>Ren’Py allows changing this tag at init time by setting <code>config.side_image_prefix_tag</code>, in case you ever want to develop your own game and change it. Fellow modders, please don’t change this in AwSW as it will break my mod. 😅<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+        <li id="fn3" role="doc-endnote"><p>Some exceptions:</p>
+        <ul>
+        <li><p>Reza pointing a gun to the side, as he is offset when he does so. We can manually adjust the bounding box for that one case.</p></li>
+        <li><p>Bryce has multiple issues:</p>
+        <ul>
+        <li><p>Bryce has no angry or sad right-facing image wearing a badge, so we have to use the badgeless image to prevent him suddenly gaining a scar in the side image.</p></li>
+        <li><p>Multiple “Old” (scar-less) images are marked as “flip”ped but actually facing the other way. We have to manually flip these back before cropping.</p></li>
+        </ul></li>
+        </ul>
+        <a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></li>
+        <li id="fn4" role="doc-endnote"><p>AwSW uses a 1920x1080 screen resolution as its base, then Ren’Py scales up or down all of its rendering to fit the window size the game is actually played with. This rebuilding of the image processing pipeline can result in some wild corruptions. Check out what happens if you click quickly between different resolutions in the AwSW settings menu! (At least, that was the case for Windows 10, and MacOS didn’t even need you to click quickly, just click once.)<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+        </ol>
+        </section>
+    </section>
+    <footer>
+        <span itemprop="https://schema.org/copyrightNotice">
+            © <span itemprop="https://schema.org/copyrightYear">2023</span>-<span itemprop="https://schema.org/copyrightYear">2024</span>
+            <span itemprop="https://schema.org/copyrightHolder" itemscope itemtype="https://schema.org/Person">
+                <span itemprop="https://schema.org/givenName">Matthew</span>
+                <span itemprop="https://schema.org/familyName">Dupree</span>
+            </span>
+        </span>
+        <span>Updated: <time itemprop="https://schema.org/lastReviewed" datetime="2024-08-10">2024-08-10</time></span>
+    </footer>
+</body>
+
+</html>

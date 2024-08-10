@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html $if(lang)$ lang="$lang$" $endif$>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    $for(author-meta)$
+    <meta name="author" content="$author-meta$" />
+    $endfor$
+    $if(date-meta)$
+    <meta name="date" content="$date-meta$" />
+    $endif$
+    $if(keywords)$
+    <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+    $endif$
+    <meta name="theme-color" content="#00001D">
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css" />
+    <title>MatthewD's Blog - $pagetitle$</title>
+    <style>
+        $styles.html()$
+    </style>
+    $if(math)$
+    $math$
+    $endif$
+    $for(header-includes)$
+    $header-includes$
+    $endfor$
+    <script>0 /*prevents Firefox FOUC*/</script>
+</head>
+
+<body>
+    <header class="frontpage blueblack_gradient">
+        <h1><a href="..">Matthew Dupree</a>: <a href=".">Blog</a></h1>
+        <code>@4onen</code>
+    </header>
+    <header class="centercolumn box">
+        $if(title)$
+        <h1 class="blog-title">$title$</h1>
+        $endif$
+        $if(subtitle)$
+        <p class="blog-subtitle">$subtitle$</p>
+        $endif$
+        $for(author)$
+        <p class="blog-author">$author$</p>
+        $endfor$
+        $if(date)$
+        <p class="blog-date">$date$</p>
+        $endif$
+    </header>
+    $if(toc)$
+    <section class="centercolumn box">
+        <nav id="$idprefix$TOC" role="doc-toc" aria-label="Table of Contents">
+            $if(toc-title)$
+            <h2 id="$idprefix$toc-title">$toc-title$</h2>
+            $endif$
+            $table-of-contents$
+        </nav>
+    </section>
+    $endif$
+    <section class="centercolumn box">
+        $body$
+    </section>
+    <footer>
+        <span itemprop="https://schema.org/copyrightNotice">
+            © <span itemprop="https://schema.org/copyrightYear">2023</span>-<span itemprop="https://schema.org/copyrightYear">2024</span>
+            <span itemprop="https://schema.org/copyrightHolder" itemscope itemtype="https://schema.org/Person">
+                <span itemprop="https://schema.org/givenName">Matthew</span>
+                <span itemprop="https://schema.org/familyName">Dupree</span>
+            </span>
+        </span>
+        <span>Updated: <time itemprop="https://schema.org/lastReviewed" datetime="2024-08-10">2024-08-10</time></span>
+    </footer>
+</body>
+
+</html>

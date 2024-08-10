@@ -6,7 +6,7 @@ date: 2024-08-10
 ---
 ## Introduction
 
-Recently in the AwSW community I have noticed some confusion about the order in which the Ren'Py game engine, augmented with our community's wonderful core modtools, loads mods. There's a lot to unpack, from compatibility issues to unexpected gameplay changes. So today, I'll be breaking down the importance of load order for AwSW mods, outlining the common pitfalls, and offering best practices to ensure a smooth and enjoyable experience. Whether you're a seasoned modder or just starting out.
+Recently in the AwSW community I have noticed some confusion about the order in which the Ren'Py game engine, augmented with our community's wonderful core modtools, loads mods. There's a lot to unpack, from compatibility issues to unexpected gameplay changes. I'll be breaking down the importance of load order for AwSW mods, outlining the common pitfalls, and offering best practices to ensure a smooth and enjoyable experience.
 
 ## What is a Load Order?
 
@@ -34,19 +34,19 @@ The Ren'Py game engine, during startup, produces and caches a scan[^1] of all th
 [^3]: See <https://github.com/renpy/renpy/blob/183327eec5920060af4a2db808ed19e0de4f1211/renpy/script.py#L259>{target="_blank"}
 [^4]: See <https://github.com/renpy/renpy/blob/183327eec5920060af4a2db808ed19e0de4f1211/renpy/loader.py#L183>{target="_blank"}
 
-The game will search for both rpy and rpyc files at each path, and compile and load them in this sorted order. Notably, the rpyc file takes precedence, unless the game is in a full-recompilation mode or the MD5 hash of the rpy file does not match the hash stored at the end of the rpyc file.[^5] This is why Ren'Py can take a while to load as you add more, larger mods. It is taking the MD5 hash of every rpy file to check if it needs to recompile it. The more mods you add, the more files it has to check, since we distribute mods as source code.
+The game will search for both rpy and rpyc files at each path, and compile and load them in this sorted order. Notably, the rpyc file takes precedence, unless the game is in a full-recompilation mode or the MD5 hash of the rpy file does not match the hash stored at the end of the rpyc file.[^5] This is why Ren'Py can take a while to load as players add more, larger mods. Ren'Py is taking the MD5 hash of every rpy file to check if it needs to recompile it. The more mods added, the more files it has to check, since the modding community has chosen to distribute mods as source code.
 
 [^5]: See <https://github.com/renpy/renpy/blob/183327eec5920060af4a2db808ed19e0de4f1211/renpy/script.py#L701>{target="_blank"}
 
 ### Init Phases
 
-After loading the script files, Ren'Py will collect all the `init` blocks from the script files into a list called `initcode`, which is then sorted _stably_ by priority.[^6] The Ren'Py documentation explains that each `init` block has a "priority" that determines the order in which they are executed. Negative priorities are executed first, then zero, then positive. Because we sort the list stably, if two `init` blocks have the same priority, they will be executed in the order they were found in the script files. Within one script file, this means they execute in order as you go down the file. Between script files, this means they execute in the order the files were loaded, described above.
+After loading the script files, Ren'Py will collect all the `init` blocks from the script files into a list called `initcode`, which is then sorted _stably_ by priority.[^6] This priority is an attribute of every init block that determines the order in which they are executed. Negative priorities are executed first, then zero, then positive. Because we sort the list stably, if two `init` blocks have the same priority, they will be executed in the order they were found in the script files. Within one script file, this means they execute in order as you go down the file. Between script files, this means they execute in the order the files were loaded, described above.
 
 [^6]: See <https://github.com/renpy/renpy/blob/183327eec5920060af4a2db808ed19e0de4f1211/renpy/script.py#L266>
 
 Init phases that are allowed for users to manipulate in their game range from -999 to 999. The default init phase for an init block is 0, which is the init phase used by the majority of AwSW.
 
-This means that mods are loaded whenever the `modloader/bootstrap.rpy` file appears in the list of script files, which falls in the midst of the game's own init blocks. As `modloader` sorts before `mods`, the modtools run and import mod configurations before any mod scripts with init priority 0 are have run, but after the Ren'Py game engine has loaded all script files and solidified their load order. Any negative priority `init` blocks have already run, and any positive priority `init` blocks will run after the modtools have finished their loading process.
+Mods are loaded during init phase 0, so whenever the `modloader/bootstrap.rpy` file appears in the list of script files. This falls in the midst of the game's own init blocks, before all files alphabetically sorted after `modloader` and after all files alphabetically sorted before `modloader`. As `modloader` sorts before `mods`, the modtools run and import mod configurations before any mod scripts with init priority 0 are have run, but after the Ren'Py game engine has loaded all script files and solidified their load order. Any negative priority `init` blocks have already run. Any positive priority `init` blocks will run after the modtools have finished their loading process.
 
 ## The Modtools Load Order
 
@@ -80,19 +80,29 @@ Each mod's subclass of `modclass.Mod` may also define a `dependencies` class var
 * **Optional Dependency**: A string starting with `?` (a question mark) followed by the name of another mod. No error is raised if the dependency is not found, but the mod declaring this optional dependency will not be loaded until the mod it depends on has been loaded if both are present.
 * **Incompatibility**: A string starting with `!` (an exclamation point) followed by the name of another mod. If the mod declaring this incompatibility is to be loaded on the same copy of the game as the mod declared incompatible, the game will raise an error and halt.
 
-The modtools will then topologically sort the mods based on their dependencies, ensuring that mods that have no dependencies are loaded first, followed by mods that depend on those mods, and so on. If a cycle is detected in the dependency graph, the game will raise an error and halt.
+An example dependency list might look like this:
+
+```python
+dependencies = [
+    "MagmaLink",
+    "?Side Images",
+    "!My Cool Game-Breaking Mod",
+]
+```
+
+The order of dependencies in this list is not important, nor is it preserved in any way -- the list is treated like a set of dependencies. The modtools will then topologically sort the mods based on their dependencies, ensuring that mods that have no dependencies are loaded first, followed by mods that depend on those mods, and so on. If a cycle is detected in the dependency graph, the game will raise an error and halt.
 
 While the topological sort is stable, it is a stable sort on the order the mods were discovered, which is an unstable order dependent on the operating system. This means that the order in which mods are discovered can affect the order in which they are loaded if they have no dependencies on each other. If a mod developer intends to have any cross-mod functionality, they should declare the other mod(s) as at least optional dependenc(ies) to ensure it is loaded before their mod.
 
 ### `mod_load`
 
-The `mod_load` method of each mod is called in the order the mods were topologically sorted. This means that mods with no dependencies are loaded first, followed by mods that depend on those mods, and so on. This is where the mod should set up any global variables, register any new screens, or perform any other setup that should happen before the game starts.
+The `mod_load` method of each mod is called in the order the mods were topologically sorted. This means that mods with no dependencies are loaded first, followed by mods that depend on those mods, and so on. This is where the mod should set up any scene changes, register any new screens, or perform any other setup that should happen before the game starts.
 
 Many mods depend on a mod called MagmaLink, which provides a framework to massively ease the process of manipulating the game's scenes. All functionality relating to MagmaLink should typically be performed in this `mod_load` method, as MagmaLink is not guaranteed to be loaded prior to this point, and most mods expect game scene manipulations to be complete by the time their `mod_complete` method is called.
 
 ### `mod_complete`
 
-The `mod_complete` method of each mod is called in the order the mods were topologically sorted. This is where the mod should perform any final setup that requires all mods to be loaded. Before dependency resolution was added to the modtools, this was the only place where mods could be sure that all other mods were loaded. Now, this method is largely vestigial, but it is still a required definition for each mod to have.
+The `mod_complete` method of each mod is called in the order the mods were topologically sorted, after all mods' `mod_load` methods. This is where the mod should perform any final setup that requires all mods to be loaded. Before dependency resolution was added to the modtools, this was the only place where mods could be sure that all other mods were loaded. Now, this method is largely vestigial, but it is still a required definition for each mod to have.
 
 Some mods still choose to wait until here to load their "Side Images" or other optional mod assets.
 
@@ -130,7 +140,6 @@ To ensure a smooth modding experience for modders and users, here are some best 
 * **Read the Mod Descriptions:** Before installing a mod, read the mod description to understand its functionality and compatibility. Usually mods declare their incompatible mods in their description, to save you the effort of downloading and installing incompatible mods.
 * **Use the Steam Workshop:** The Steam Workshop provides an easy way to manage and install mods for AwSW. It automatically updates mods and suggests necessary dependencies.
 * **Report Bugs:** If you encounter any bugs or issues with mods, report them to the mod author or AwSW Unofficial Fan Discord so they can be addressed.
-
 
 ### Modders
 

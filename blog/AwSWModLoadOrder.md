@@ -92,7 +92,7 @@ dependencies = [
 
 The order of dependencies in this list is not important, nor is it preserved in any way -- the list is treated like a set of dependencies. The modtools will then topologically sort the mods based on their dependencies, ensuring that mods that have no dependencies are loaded first, followed by mods that depend on those mods, and so on. If a cycle is detected in the dependency graph, the game will raise an error and halt.
 
-While the topological sort is stable, it is a stable sort on the order the mods were discovered, which is an unstable order dependent on the operating system. This means that the order in which mods are discovered can affect the order in which they are loaded if they have no dependencies on each other. If a mod developer intends to have any cross-mod functionality, they should declare the other mod(s) as at least optional dependenc(ies) to ensure it is loaded before their mod.
+The implementation of the topological sort is an unstable O(N^2), which is performed on the already-unstable order that mods wre discovered. This means that unless a dependency relation is explicitly declared, no ordering of mod loading can be strictly guaranteed. If a mod intends to have any cross-mod functionality, it should declare the other mod(s) as at least optional dependenc(ies) to ensure the other(s) load(s) first.
 
 ### `mod_load`
 

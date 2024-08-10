@@ -28,8 +28,8 @@ html {
 @media (prefers-color-scheme: light) {
     :root {
         --background-color: Canvas;
-        --background-color: lightskyblue;
-        --accent-color: cornflowerblue;
+        --background-color: azure;
+        --accent-color: lightskyblue;
         --text-color: black;
         --text-color: CanvasText;
     }
@@ -230,7 +230,7 @@ img.icon,
 }
 
 .centercolumn {
-    max-width: 500px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -267,4 +267,21 @@ h1>a {
     0% {
         visibility: hidden;
     }
+}
+
+li {
+    margin-inline-start: 1em;
+    margin-block-start: 0.5em;
+}
+
+ul, ol {
+    margin-block-start: 0;
+}
+
+pre.sourceCode {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 1em;
+    overflow-x: auto;
+    border: 1px solid var(--accent-color);
 }

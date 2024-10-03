@@ -2,15 +2,18 @@
 tags: Blog/JS13K
 title: "The City Without That Number: Postmortem"
 author: 4onen
-date: 2024-10-01
+date: 2024-10-02
 ---
-# The City Without That Number: Postmortem
 
 At the end of this post, you'll find [Appendix A](#appendix-a) where I have the initial notes I made for my game's plan. I typed them into my phone while taking a walk the very day the theme for this year's JS13K was announced. That initial scope was exceptional, planning for far more than I think I'd be able to fit in 13kb even given arbitrary time to work on it. Given that initial exceptional scope, I think it's no surprise that the game didn't turn out quite like I'd hoped. The final result, however, did not meet even my scaled-back expectations, despite how I felt about it at 2am the night of submission. Let's talk about that.
 
-## The Good
+# The Game
 
-At submission, the game was genuinely impeessive in a number of aspects that I _should_ feel accomplished having achieved. I don't, due to its flaws, but we'll get to those. First, the areas of success:
+You can play the game [here](https://js13kgames.com/entries/the-city-without-that-number). This is a postmortem for that game, so I'm assuming you're at least somewhat aware of what it is. The code of the game is available at [my GitHub repository](https://github.com/4onen/js13k-2024-city-builder/commit/9f9851b0de133a2a6f438dfae3613aad58433c9d) (under GPLv3) and also at the [JS13K fork of the repository](https://github.com/js13kGames/the-city-without-that-number).
+
+# The Good
+
+At submission, the game was genuinely impressive in a number of aspects that I _should_ feel accomplished having achieved. I don't, due to its flaws, but we'll get to those. First, the areas of success:
 
 * **Reducing scope**: My original plan was for a city builder on the scale of a hundredth-size Sim City 4, something with growth, zoning, demand, and autonomous development. When I was halfway through the month and had only a static, flat grid of house development stages in-engine, I knew something had to change. So I switched to the puzzle genre, focusing on tight maps that would emphasize the aversion to 13. This was the right move to make, and resulted in something at the end I felt comfortable calling "complete," despite how incorrect that statement turned out to be.
 
@@ -20,7 +23,7 @@ At submission, the game was genuinely impeessive in a number of aspects that I _
 
 * Graphics: The game carries an incredibly cheap, distinctive, and (at least in my opinion) charming graphical style, with details preserved for the places they have the most impact. Nearly branchless graphics coding also makes the game performant on both desktop and mobile, even facing excessively large (for the toolset) maps.
 
-* Sound: Outsourcing my attempts to do audio to the ZzFX sound engine was a genuinely good plan and justifies the day I spent shopping around for sound engine options. As sound is a secondary component of my game experience, this let me build on what I was developing without sacrificing excessive developmemt time as I have in my other WebAudio ventures.
+* Sound: Outsourcing my attempts to do audio to the ZzFX sound engine was a genuinely good plan and justifies the day I spent shopping around for sound engine options. As sound is a secondary component of my game experience, this let me build on what I was developing without sacrificing excessive development time as I have in my other WebAudio ventures.
 
 * Licensing: One thing I've felt increasingly awkward about in recent projects is that large companies can snap up and use certain kinds of open source code with barely a line of attribution in a well-hidden page. By licensing under GPLv3, I'm preserving the ability for people to see and build on the code for their own edification in perpetuity, which I feel builds on the spirit of the entire JS13K competition and ecosystem as I have experienced it. That leads into...
 
@@ -28,32 +31,33 @@ At submission, the game was genuinely impeessive in a number of aspects that I _
 
 The trouble is, while all of these are nice outcomes, I feel they were overshadowed by some pretty large defects.
 
-## The Bad
+# The Bad
 
 I made some pretty massive mistakes in this project. It, and I, deserve our negative feedback for these errors.
 
-### The Last Minute Change
+## The Last Minute Change
 
-Let's start with the big one. At 1:53am CDT, just 4 hours before the competition ended, I looked at what I had and decided, in my infinite wisdom as the developer who made it, that my game wasn't _challenging_ enough. So I made a one-line change to increase the dificulty from rejecting _powers_ of 13 to rejecting _multiples_ of 13.
+Let's start with the big one. At 1:53am CDT, just 4 hours before the competition ended, I looked at what I had and decided, in my infinite wisdom as the developer who made it, that my game wasn't _challenging_ enough. So I made a one-line change to increase the difficulty from rejecting _powers_ of 13 to rejecting _multiples_ of 13.
 
 ```diff
+// Diff from before and after the last-minute change
 -const can_see = (n) => n != N && n != N * N && n != N * N * N && n != N * N * N * N && n != N * N * N * N * N;
 +const can_see = (n) => n != 0 && n % N != 0;
 ```
 
 Astute programmers may already see the error. Yes, my zero check and the `&&` condition are reversed from what they should be: `n == 0 || ...`.
 
-In the submission copy of The City Without That Number, it is impossible to bring any number in stats _back_ to zero after it has been nonzero. This results in cripplingly confusing gameplay and makes some maps utterly worthless for their intended purpose. Two of the most critically impacted are `dbl` and `chkr`. On `dbl` because there is only room for one building and no stories, you can only placw one building ever, making learning the bulldozer tool and building rotation impossible. `chkr` similarly allows 2x2 buildings, but placing one in the only possible space is now a trap, preventing you from using the space to work up your 1x1 count.
+In the submission copy of The City Without That Number, it is impossible to bring any number in stats _back_ to zero after it has been nonzero. This results in cripplingly confusing gameplay and makes some maps utterly worthless for their intended purpose. Two of the most critically impacted are `dbl` and `chkr`. On `dbl` because there is only room for one building and no stories, you can only place one building ever, making learning the bulldozer tool and building rotation impossible. `chkr` similarly allows 2x2 buildings, but placing one in the only possible space is now a trap, preventing you from using the space to work up your 1x1 count.
 
 Of course, these dead ends lead into a bigger issue.
 
-### Goals: What are we doing here?
+## Goals: What are we doing here?
 
 The first feedback for my game, and what led to me recognizing I had shipped [the big bug](#the-last-minute-change) was:
 
 > I do not know how to play your game.
 
-This cannot even slightly be attributed to the big bug. I made a mistake that four and five year olds should be growing out of: I forgot the theory of mind. I forgot to remember other people aren't me and don't know what I know.
+This cannot even slightly be attributed to the big bug. I made a mistake that four and five-year-olds should be growing out of: I forgot the theory of mind. I forgot to remember other people aren't me and don't know what I know.
 
 The tutorial levels were designed to be tiny practical examples of the game's behavior, but I failed to communicate that behavior alongside those examples. I gave no indication of success or failure. To make an outdated reference, I had given them cow tools without comment and had assumed they were obvious.
 
@@ -63,13 +67,13 @@ I had two plans in mind, either of which would have greatly helped, both of whic
 
 2. Descriptions. Literally just text describing the purpose of each level. Instead, I left users staring at abbreviations so terse they were questioning even their meaning.
 
-I had assumed, having started in the city building genre, that I could get away with the freeform nature of something like Sim City 4. Surely I wouldn't need to guide the exploration-driven audience of my title. This assumption completely ignored my pivot from the city sim genre to the puzzle genre.
+I had assumed, having started in the city building genre, that I could get away with the free-form nature of something like Sim City 4. Surely I wouldn't need to guide the exploration-driven audience of my title. This assumption completely ignored my pivot from the city sim genre to the puzzle genre.
 
 In short, this was an **unacceptable** failure of game design. It is also perhaps the purest lesson in how "the users are dumb" is almost never the right response to someone struggling with what you've made. I wrote an entire lengthy reply of descriptive instructions to that first feedback, only to then test the game myself and discover my big shipped bug. I did not describe my game well enough for them to know there was a bug, to know why it was not working, and to commiserate with me on the perils of last-minute editing. Their confusion was non-obvious to me because _I_ was the one confused first.
 
 Those two major flaws aside, I still made some other painful mistakes with my project, wasting my already-limited time and effort.
 
-## The Ugly
+# The Ugly
 
 These wouldn't have sunk the ship, unlike the above, but they certainly contributed to the problem.
 
@@ -85,7 +89,7 @@ These wouldn't have sunk the ship, unlike the above, but they certainly contribu
 
 * Self-care Shmelf-care: I would sit and work on this for hours, to the exclusion of all else. Considering I already had a desk job writing code, this was not okay. The days I skipped going on walks or lost sleep over this project were especially harmful to me and it both.
 
-## The Means
+# The Means
 
 Last of all, some of you may be wondering why, after all this, my submission is 9,965 bytes and not around 12,999. Why not something more reasonable? Why, in all my wisdom, did I take a late project with such mistakes and keep crushing it so small?
 
@@ -97,15 +101,15 @@ Two reasons:
 
 These arbitrary limitations self-justified my big mistake of leaving out goals and descriptions until the very last, letting them get bumped from the game entirely.
 
-## The Ends
+# The Ends
 
 I clearly made mistakes managing this project. Do I regret submitting it under "Completed"? No. I feel like by getting any harsh feedback to my face, it reinforces the lessons I should be learning from this about project management and design:
 
 * Teach users everywhere, not just one place.
   * Clear descriptions, goals, UI, etc.
-  * Accesibility is good for everyone. My emoji buttons were cute. Not including `title=` attributes to give descriptive tooltips was not.
+  * Accessibility is good for everyone. My emoji buttons were cute. Not including `title=` attributes to give descriptive tooltips was not.
 * Prioritize the project first.
-  * Try external tools. They exists for a reason. Accept "Not-Invented-Here" only if it makes sense.
+  * Try external tools. They exist for a reason. Accept "Not-Invented-Here" only if it makes sense.
   * Working before clever. Just use more RAM and GPU bandwidth. Optimize when necessary.
   * Features of the now, not later. Don't watch YouTube videos for what might be cool to add. Watch videos on features you need.
 * Take care of yourself.
@@ -118,6 +122,8 @@ All y'all be happy out there. Best of luck in the JS13K grading. (I think we est
 
 # Appendix A: Original notes for The City Without That Number
 
+```md
+# todo.md
 We did it! It's okay! You're safe. Welcome to _The City Without That Number._
 
 Small SimCity-like where nothing is 13 (or any multiple)
@@ -147,4 +153,4 @@ Small SimCity-like where nothing is 13 (or any multiple)
         * Commercial: Fishing warf
         * Hub: Tug warf
         * Police: Police dock
-
+```

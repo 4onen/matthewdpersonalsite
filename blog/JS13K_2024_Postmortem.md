@@ -47,7 +47,7 @@ In the submission copy of The City Without That Number, it is impossible to brin
 
 Of course, these dead ends lead into a bigger issue.
 
-## Goals: What are we doing here?
+### Goals: What are we doing here?
 
 The first feedback for my game, and what led to me recognizing I had shipped [the big bug](#the-last-minute-change) was:
 
